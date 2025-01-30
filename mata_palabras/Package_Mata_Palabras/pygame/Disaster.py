@@ -48,8 +48,13 @@ def colocar_palabra_en_matriz(palabra:int, matriz:list, ancho_celda:int, alto_ce
 
     return posicion
 
-#Esta funcion ordena los puntajes de mayor a menor ajustando los puntajes poniendo 0 al principio.
-#Recibe la data (puntuacion) y la longitud minima
+
+"""_summary_
+Ordena los puntajes de mayor a menor ajustando los puntajes poniendo 0 al principio.
+Args:
+    data (int): La puntuaciónn.
+    longitud_minima (int): longitud máxima.
+"""
 def ordenar_estadistica(data:int, longitud_minima:int):
     if data:
         for i in range(len(data)):

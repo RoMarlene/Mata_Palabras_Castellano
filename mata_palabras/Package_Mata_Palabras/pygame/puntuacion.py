@@ -1,7 +1,10 @@
 import pygame
 import json
-from Modulo_central import crear_boton, dibujar, datos, DIMENSIONES_PANTALLA, imagenes, sonidos,ajustar_volumen, mostrar_icono_volumen
-from Disaster import *
+from Botones import crear_boton, dibujar
+from Datos_juego import datos, DIMENSIONES_PANTALLA, imagenes, sonidos
+from Configuraciones import ajustar_volumen
+from Disaster import ordenar_estadistica
+from Funciones import *
 
 # Función para cargar las puntuaciones desde el archivo JSON
 def cargar_puntuaciones():
@@ -22,70 +25,70 @@ def mostrar_puntuaciones(puntuaciones, ventana_puntuacion):
         desplazamiento_y += 40 
 
 def ventana_puntuacion():
-    pygame.init()
-    pygame.mixer.init()
-
-    ventana_puntuacion = pygame.display.set_mode(DIMENSIONES_PANTALLA)
-    pygame.display.set_caption("Puntuación")
-
-    imagen_fondo_juego = pygame.image.load(imagenes["Fondo_Puntuacion"])
-
-    pygame.mixer.music.load(sonidos["cancion_puntuacion"])  # Cargar la canción
-    pygame.mixer.music.play(loops=-1)
-
-    longitud_minima = 5
-    boton_volver = crear_boton(
-        ventana=ventana_puntuacion,
-        posicion=(624, 68),
-        dimensiones_boton=[160 , 56],
-        path_imagen= imagenes["Puntuacion"]
+    ventana, imagen_fondo_juego, _, _ = inicializar_pantalla(
+        titulo="Puntuación",
+        icono=imagenes["Icono"],
+        fondo=imagenes["Fondo_Puntuacion"],
+        fuente_config=("Arial", 30),
+        color_fuente=datos["BLANCO"],
+        musica=sonidos["cancion_puntuacion"],
+        volumen=datos["volumen_predefinido"]
     )
 
+    # Configurar el botón de volver
+    boton_volver = crear_boton(
+        ventana=ventana,
+        posicion=(624, 68),
+        dimensiones_boton=[160, 56],
+        path_imagen=imagenes["Volver"]  # Asegúrate de que esta clave sea correcta
+    )
 
+    boton_sonido = pygame.mixer.Sound(sonidos["botones"])
+    imagen_icono = pygame.image.load(imagenes["Icono_volumen"])
+    icono_volumen = pygame.transform.scale(imagen_icono, (50, 50))
+    longitud_minima = datos["longitud_minima"]
+
+    # Cargar y ordenar puntuaciones
     puntuaciones = cargar_puntuaciones()
     if puntuaciones:
         ordenar_estadistica(puntuaciones, longitud_minima)
-        puntuaciones = cargar_puntuaciones()
-
-    boton_sonido = pygame.mixer.Sound(sonidos["botones"])
 
     siguiente_pantalla = "puntuacion"
-    mostrar_icono = False
-    volumen = 0.5
-    pygame.mixer.music.set_volume(volumen)
-
-    imagen_icono = pygame.image.load(imagenes["Icono_volumen"])
-    icono_volumen = pygame.transform.scale(imagen_icono, (50, 50))
-
     bandera_juego = True
-    while bandera_juego:
+    volumen = datos["volumen_predefinido"]
+    mostrar_icono = False
 
+    while bandera_juego:
         lista_eventos = pygame.event.get()
+
         for evento in lista_eventos:
+            # Usar la función manejar_boton
+            siguiente_pantalla = manejar_boton(evento, boton_volver, boton_sonido, "puntuacion", "volver") or siguiente_pantalla
+
+            if siguiente_pantalla == "menu":
+                bandera_juego = False
+                break
+
+            # Manejar salida con el evento QUIT
             if evento.type == pygame.QUIT:
-                pygame.quit()
                 siguiente_pantalla = "salir"
                 bandera_juego = False
-            elif evento.type == pygame.MOUSEBUTTONDOWN:
-                if boton_volver["Rectangulo"].collidepoint(evento.pos):
-                    boton_sonido.play()
-                    pygame.mixer.music.stop()
-                    siguiente_pantalla = "menu"
-                    bandera_juego = False
+                break
 
-        volumen, mostrar_icono = ajustar_volumen(lista_eventos, volumen, icono_volumen)
+        # Ajustar el volumen según los eventos
+        volumen, mostrar_icono = ajustar_volumen(lista_eventos, volumen)
+
+        # Dibujar en la ventana
         dibujar(boton_volver)
-        pygame.draw.rect(ventana_puntuacion, "Green", boton_volver["Rectangulo"], 9)
-        
-        ventana_puntuacion.blit(imagen_fondo_juego, [0, 0])
-        
+        ventana.blit(imagen_fondo_juego, (0, 0))
+
         if puntuaciones:
-            mostrar_puntuaciones(puntuaciones, ventana_puntuacion)
+            mostrar_puntuaciones(puntuaciones, ventana)
 
         if mostrar_icono:
-            ventana_puntuacion.blit(icono_volumen, (10, 10))
-
+            ventana.blit(icono_volumen, (10, 10))
 
         pygame.display.update()
-        pygame.time.delay(100)
+
+
     return siguiente_pantalla

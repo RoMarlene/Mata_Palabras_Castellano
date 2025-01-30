@@ -1,19 +1,25 @@
 import pygame
 
-# Función para controlar el volumen
-#Recibe los eventos, el volumen y la imagen del icono
-#Devuelve una tupla de volumen y mostrar_icono
-def ajustar_volumen(eventos: any, volumen: int, imagen_icono: str)-> tuple:
+"""_summary_
+
+Args:
+    eventos (any): Los eventos
+    volumen (int): El volumen
+
+Returns:
+    tuple: Devuelve el volumen "nuevo" y muestra el icono del volumen
+"""
+def ajustar_volumen(eventos: any, volumen: int)-> tuple:
     mostrar_icono = False
     for evento in eventos:
         if evento.type == pygame.KEYDOWN:
-            if evento.key == pygame.K_UP:  # Flecha arriba
+            if evento.key == pygame.K_UP:
                 volumen += 0.1
                 if volumen > 1.0:  # No puede exceder el volumen máximo
                     volumen = 1.0
                 pygame.mixer.music.set_volume(volumen)
                 mostrar_icono = True
-            elif evento.key == pygame.K_DOWN:  # Flecha abajo
+            elif evento.key == pygame.K_DOWN:
                 volumen -= 0.1
                 if volumen < 0.0:  # No puede ser menor que el volumen mínimo
                     volumen = 0.0
@@ -22,8 +28,13 @@ def ajustar_volumen(eventos: any, volumen: int, imagen_icono: str)-> tuple:
 
     return volumen, mostrar_icono
 
-#Esta funcion devuelve el icono del volumen cuando es necesario.
-#Recibe la ventana, la imagen del icono y el icono.
+"""_summary_
+
+Args:
+    ventana (str): La ventana.
+    imagen_icono (str): Imagen del icono.
+    mostrar_icono (str): El icono en si.
+"""
 def mostrar_icono_volumen(ventana: str, imagen_icono:str, mostrar_icono:str):
     if mostrar_icono:
         ventana.blit(imagen_icono, (10, 10))

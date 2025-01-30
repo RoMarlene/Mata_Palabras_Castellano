@@ -1,8 +1,18 @@
 import pygame
 
-#Esta funcion crea los botones para los botones
-#Recibe la ventana, la posicion, las dimensiones y como parametro opcional, fuente y el path de la imagen.
-#Devuelve el boton
+"""Crea el boton
+
+Args:
+    ventana (str): Recibe la superficie.
+    posicion (int): La posición.
+    dimensiones_boton (int): Las dimensiones del botón.
+    fuente (str, optional): La fuente del boton. Por defecto devuelve None.
+    path_imagen (str, optional): El path de la imagen. Por defecto devuelve None.
+
+Returns:
+    dict: El diccionario del boton (O sea, lo que contiene)
+"""
+
 def crear_boton(ventana: str, posicion: int, dimensiones_boton: int, fuente: str = None, path_imagen: str = None) -> dict:
     boton = {}
     boton["Ventana"] = ventana #Surface
@@ -13,8 +23,6 @@ def crear_boton(ventana: str, posicion: int, dimensiones_boton: int, fuente: str
     if path_imagen != None:
         imagen_juego = pygame.image.load(path_imagen)
         boton["Superficie"] = pygame.transform.scale(imagen_juego, boton["Dimensiones"])
-    else:
-        pass
 
     boton["Rectangulo"] = boton["Superficie"].get_rect()
     
@@ -23,7 +31,11 @@ def crear_boton(ventana: str, posicion: int, dimensiones_boton: int, fuente: str
     return boton
 
 
-#Esta funcion dibuja el boton, recibe el boton.
+"""
+Dibuja el boton.
+Args:
+    boton (dict): Recibe el boton
+"""
 def dibujar(boton: dict):
     try:
         # Verifica que la ventana esté activa antes de intentar blitear

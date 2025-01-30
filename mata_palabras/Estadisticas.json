@@ -1,38 +1,62 @@
 [
     {
-        "Nombre": "Tu culito saca llama ",
+        "Nombre": "Nowhere",
         "Puntaje": "00210",
-        "Tiempo": 55,
+        "Tiempo": 51,
         "Vidas": 0
     },
     {
-        "Nombre": "Tristeza",
-        "Puntaje": "00165",
-        "Tiempo": 53,
+        "Nombre": "Chiquii",
+        "Puntaje": "00195",
+        "Tiempo": 44,
         "Vidas": 0
     },
     {
-        "Nombre": "Rochii",
-        "Puntaje": "00140",
-        "Tiempo": 42,
+        "Nombre": "Holaa",
+        "Puntaje": "00180",
+        "Tiempo": 47,
         "Vidas": 0
     },
     {
-        "Nombre": "Trakate",
-        "Puntaje": "00100",
-        "Tiempo": 29,
+        "Nombre": "Trakateee",
+        "Puntaje": "00130",
+        "Tiempo": 35,
         "Vidas": 0
     },
     {
-        "Nombre": "Rochi",
-        "Puntaje": "00055",
-        "Tiempo": 37,
+        "Nombre": "Historyyy",
+        "Puntaje": "00090",
+        "Tiempo": 27,
         "Vidas": 0
     },
     {
-        "Nombre": "Lyase",
+        "Nombre": "Final",
+        "Puntaje": "00015",
+        "Tiempo": 15,
+        "Vidas": 0
+    },
+    {
+        "Nombre": "dsadsaa",
         "Puntaje": "00000",
-        "Tiempo": 2,
+        "Tiempo": 3,
+        "Vidas": 0
+    },
+    {
+        "Nombre": "Holaa",
+        "Puntaje": "00000",
+        "Tiempo": 14,
+        "Vidas": 0
+    },
+    {
+        "Nombre": "Tutu",
+        "Puntaje": "00000",
+        "Tiempo": 14,
+        "Vidas": 0
+    },
+    {
+        "Nombre": "tuku",
+        "Puntaje": "00000",
+        "Tiempo": 14,
         "Vidas": 0
     }
 ]

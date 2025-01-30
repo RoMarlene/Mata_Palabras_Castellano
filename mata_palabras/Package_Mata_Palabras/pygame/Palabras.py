@@ -1,67 +1,73 @@
 import pygame
-import csv
-import time
+from Datos_juego import TECLAS_JUEGO
 
 # Función para manejar el cuadro de texto y la entrada del usuario
-def manejar_cuadro_texto(eventos, texto_usuario: str, activo:bool, input_rect, palabras_actuales:str, vidas:int, puntaje:int, puntajes:int)->tuple:
+def manejar_cuadro_texto(eventos, texto_usuario: str, activo: bool, input_rect, palabras_actuales: list, vidas: int, puntaje: int, puntajes: dict, max_longitud_texto: int = 20) -> tuple:
     eliminar_palabra = False
-    texto_procesado = texto_usuario  # Guarda el texto ingresado antes de modificarlo
+    texto_procesado = ""  # Texto ingresado final para comparación
 
     for evento in eventos:
         if evento.type == pygame.MOUSEBUTTONDOWN:
-            if input_rect.collidepoint(evento.pos):
-                activo = True
-            else:
-                activo = False
+            activo = input_rect.collidepoint(evento.pos)
 
         if evento.type == pygame.KEYDOWN and activo:
-            if evento.key == pygame.K_RETURN:
+            if evento.key == TECLAS_JUEGO["enviar"]:
+                puntaje, vidas, eliminar_palabra = validar_palabra(texto_usuario, palabras_actuales, puntajes, vidas, puntaje)
                 texto_procesado = texto_usuario.lower().strip()
-                palabra_encontrada = False
+                texto_usuario = ""  # Limpiar el campo tras validar
 
-                for palabra in palabras_actuales:
-                    if texto_procesado == palabra.lower().strip():
-                        palabra_encontrada = True
-                        break
-
-                if palabra_encontrada:
-                    eliminar_palabra = True
-                    puntaje += puntajes.get(texto_procesado, 0)
-                else:
-                    vidas -= 1
-
-                texto_usuario = ""  # Limpiar después de manejar el texto
-            elif evento.key == pygame.K_BACKSPACE:
+            elif evento.key == TECLAS_JUEGO["borrar"]:
                 texto_usuario = texto_usuario[:-1]
-            else:
+
+            elif len(texto_usuario) < max_longitud_texto:
                 texto_usuario += evento.unicode
 
     return texto_usuario, activo, eliminar_palabra, vidas, puntaje, texto_procesado
 
+def manejar_cuadro_texto_final(eventos, texto_usuario: str, activo: bool, input_rect, max_longitud_texto: int = 20) -> tuple:
+    """
+    Maneja un cuadro de texto simple utilizando un diccionario de teclas.
+    - Permite escribir texto dentro de un rectángulo activo.
+    - Al presionar la tecla de enviar, devuelve el texto procesado.
+    """
+    texto_procesado = ""  # Texto final para guardar
 
-# Función para dibujar el cuadro de texto en la pantalla
-def dibujar_cuadro_texto(pantalla, fuente, input_rect, texto_usuario, color_actual):
-    pygame.draw.rect(pantalla, color_actual, input_rect, 2)
-    texto_superficie = fuente.render(texto_usuario, True, (255, 255, 255))
-    pantalla.blit(texto_superficie, (input_rect.x + 5, input_rect.y + 5))
+    for evento in eventos:
+        if evento.type == pygame.MOUSEBUTTONDOWN:
+            # Activa el cuadro si el clic está dentro del rectángulo
+            activo = input_rect.collidepoint(evento.pos)
 
+        if evento.type == pygame.KEYDOWN and activo:
+            if evento.key == TECLAS_JUEGO["enviar"]:  # Enter
+                texto_procesado = texto_usuario.strip()
+                texto_usuario = ""  # Limpia el campo después de guardar
+            elif evento.key == TECLAS_JUEGO["borrar"]:  # Backspace
+                texto_usuario = texto_usuario[:-1]
+            else:
+                # Agrega texto si no supera el límite
+                if len(texto_usuario) < max_longitud_texto:
+                    texto_usuario += evento.unicode
 
-# Función para mostrar un mensaje en la pantalla
-def mostrar_mensaje(pantalla, mensaje, color, x, y, tamaño=40):
-    fuente = pygame.font.Font(None, tamaño)
-    texto = fuente.render(mensaje, True, color)
-    pantalla.blit(texto, (x, y))
+    return texto_usuario, activo, texto_procesado
 
+def validar_palabra(texto_usuario: str, palabras_actuales: list, puntajes: dict, vidas: int, puntaje: int) -> tuple:
+    texto_procesado = texto_usuario.lower().strip()
+    palabra_encontrada = False
 
-# Función para mostrar un mensaje temporal en la pantalla por un tiempo determinado
-def mostrar_mensaje_temporal(pantalla, mensaje, color, x, y, tiempo=3, tamaño=40):
-    tiempo_inicial = pygame.time.get_ticks()  # Obtener el tiempo de inicio
-    while pygame.time.get_ticks() - tiempo_inicial < tiempo * 1000:  # Convertir a milisegundos
-        pantalla.fill((0, 0, 0), (0, 0, pantalla.get_width(), pantalla.get_height()))  # Limpiar la pantalla si es necesario
-        mostrar_mensaje(pantalla, mensaje, color, x, y, tamaño)  # Mostrar el mensaje
-        pygame.display.update()
-        pygame.time.Clock().tick(60)  # Limitar a 60 FPS para un refresco constante
+    # Iterar sobre las palabras actuales y verificar si coinciden
+    for palabra in palabras_actuales:
+        if texto_procesado == palabra.lower().strip():
+            palabra_encontrada = True
+            break
 
+    if palabra_encontrada:
+        eliminar_palabra = True
+        puntaje += puntajes.get(texto_procesado, 0)
+    else:
+        eliminar_palabra = False
+        vidas -= 1
+
+    return puntaje, vidas, eliminar_palabra
 
 # Función para actualizar la posición de las palabras
 def actualizar_posiciones(lista_palabras: list):
@@ -70,13 +76,3 @@ def actualizar_posiciones(lista_palabras: list):
     """
     for palabra in lista_palabras:
         palabra["y"] += palabra["velocidad"]
-
-
-
-# Función para dibujar las palabras en la pantalla
-def dibujar_palabras(pantalla, lista_palabras):
-    """
-    Dibuja las palabras en la pantalla.
-    """
-    for palabra in lista_palabras:
-        mostrar_mensaje(pantalla, palabra["palabra"], (255, 255, 255), palabra["pos_x"], palabra["pos_y"])

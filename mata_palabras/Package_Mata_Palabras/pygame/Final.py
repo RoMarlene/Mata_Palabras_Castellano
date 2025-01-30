@@ -1,99 +1,93 @@
 import pygame
-from Modulo_central import crear_boton, dibujar, imagenes, sonidos, DIMENSIONES_PANTALLA, boton_sonido, ajustar_volumen, mostrar_icono_volumen
-from archivos import *
-from Datos_juego import datos
+from Configuraciones import ajustar_volumen, mostrar_icono_volumen
+from Datos_juego import datos, DIMENSIONES_PANTALLA, imagenes, sonidos, mensajes, posiciones
+from Archivos import guardar_puntaje_json
+from Funciones import manejar_eventos_generales, manejar_colores_cuadro_texto, inicializar_pantalla, blitear_imagenes
+from Esenciales import mostrar_mensaje_con_fondo  # Importa la función que creaste
+from Palabras import manejar_cuadro_texto_final
 
 def crear_final(puntaje_actual, tiempo_jugado, vidas_restantes):
-    pygame.init()
-    pygame.mixer.init()
-
-    ventana = pygame.display.set_mode(DIMENSIONES_PANTALLA)
-    pygame.display.set_caption("Final :)")
-
-    icono_ventana = pygame.image.load(imagenes["Icono"])
-    pygame.display.set_icon(icono_ventana)
-
-    imagen_icono = pygame.image.load(imagenes["Icono_volumen"])
-    icono_volumen = pygame.transform.scale(imagen_icono, (50, 50))
-    pygame.mixer.music.load(sonidos["sonido_final"])
-    volumen = 0.5
-    pygame.mixer.music.set_volume(volumen)
-    pygame.mixer.music.play(-1)
-    mostrar_icono = False
-
-    imagen_final = pygame.image.load(imagenes["Final"])
-    fuente = pygame.font.SysFont("Acumin Variable Concept", datos["tamaño_fuente"])
-    color_texto = datos["BLANCO"]
-    
-    boton_volver = crear_boton(
-        ventana=ventana,
-        posicion=(624, 68),
-        dimensiones_boton=[160, 56],
-        path_imagen=imagenes["Puntuacion"]
+    ventana, fondo_imagen, fuente, color_texto = inicializar_pantalla(
+        titulo="Final :)",
+        icono=imagenes["Icono"],
+        fondo=imagenes["Final"],
+        fuente_config=("Acumin Variable Concept", datos["tamaño_fuente"]),
+        color_fuente=datos["BLANCO"],
+        musica=sonidos["sonido_final"],
+        volumen=0.5
     )
 
-    siguiente_pantalla = "menu"
-
-    # Configuración del cuadro de texto
-    input_rect = pygame.Rect(200, 300, 400, 50) 
-    color_inactivo = pygame.Color('lightskyblue3')
-    color_activo = pygame.Color('dodgerblue2')
-    color_actual = color_inactivo
+    input_rect = datos["Rectangulo_texto_final"]
+    color_inactivo = datos["color_inactivo"]
+    color_activo = datos["color_activo"]
     texto_usuario = ""
-    activo = False
+    activo = False  # Inicializamos el estado del cuadro de texto
     bandera = True
+    siguiente_pantalla = None
+
+    icono_volumen = pygame.transform.scale(
+        pygame.image.load(imagenes["Icono_volumen"]), datos["tamaño_icono_volumen"]
+    )
+    volumen = datos["volumen_predefinido"]
+    mostrar_icono = False
 
     while bandera:
-        lista_eventos = pygame.event.get()
+        eventos = pygame.event.get()
+        bandera, siguiente_pantalla, texto_usuario, activo = manejar_eventos_generales(
+            eventos, contexto="final", activo=activo, texto_actual=texto_usuario, input_rect=input_rect
+        )
 
-        for evento in lista_eventos:
-            if evento.type == pygame.QUIT:
-                siguiente_pantalla = "salir"
-                bandera = False
+        if siguiente_pantalla:
+            if siguiente_pantalla == "guardar":
+                if texto_usuario.strip():
+                    # Guardar el puntaje
+                    guardar_puntaje_json(texto_usuario, puntaje_actual, tiempo_jugado, vidas_restantes)
+                    
+                    # Mostrar mensaje después de guardar
+                    mostrar_mensaje_con_fondo(
+                        ventana,
+                        mensajes["mensaje_final"],
+                        posiciones["posicion_mensaje_final"],
+                        color_fondo=(0, 0, 0),
+                        color_texto=color_texto,
+                        fuente=fuente
+                    )
+                    
+                    pygame.display.update()  # Actualizar pantalla para mostrar el mensaje
+                    pygame.time.wait(3000)  # Esperar 3 segundos
+                    siguiente_pantalla = "menu"  # Cambiar a la pantalla del menú
+            bandera = False
 
-            elif evento.type == pygame.MOUSEBUTTONDOWN:
-                # Activar el cuadro de texto al hacer clic en él
-                if input_rect.collidepoint(evento.pos):
-                    activo = True
-                else:
-                    activo = False
-                
-                if boton_volver["Rectangulo"].collidepoint(evento.pos):
-                    boton_sonido.play()
-                    pygame.mixer.music.stop()
-                    siguiente_pantalla = "menu"
-                    bandera = False
+        # Cambiar color del cuadro de texto según su estado
+        color_actual = manejar_colores_cuadro_texto(activo, color_activo, color_inactivo)
+        texto_usuario, activo, texto_procesado = manejar_cuadro_texto_final(
+            eventos=eventos,
+            texto_usuario=texto_usuario,
+            activo=activo,
+            input_rect=input_rect,
+            max_longitud_texto=20  # Configura el máximo número de caracteres permitidos
+        )
 
-            elif evento.type == pygame.KEYDOWN:
-                if activo:  # Solo captura texto si el cuadro está activo
-                    if evento.key == pygame.K_RETURN:
-                        if texto_usuario.strip(): 
-                            guardar_puntaje_json(texto_usuario, puntaje_actual, tiempo_jugado, vidas_restantes)
-                            texto_usuario = ""
-                    elif evento.key == pygame.K_BACKSPACE:
-                        texto_usuario = texto_usuario[:-1]
-                    else:
-                        texto_usuario += evento.unicode
-
-
-        color_actual = color_activo if activo else color_inactivo
-
-        dibujar(boton_volver)
-        pygame.draw.rect(ventana, "Green", boton_volver["Rectangulo"], 9)
-        # Dibujar en la ventana
-        ventana.blit(imagen_final, [0, 0])
-
-        # Mostrar texto de entrada
-        pygame.draw.rect(ventana, color_actual, input_rect, 2)  # Dibujar el cuadro de texto
+        # Renderizar el texto ingresado
         texto_renderizado = fuente.render(texto_usuario, True, color_texto)
-        ventana.blit(texto_renderizado, (input_rect.x + 5, input_rect.y + 5))
 
-        # Volumen y botones
-        volumen, mostrar_icono = ajustar_volumen(lista_eventos, volumen, icono_volumen)
+        # Blitear elementos
+        elementos_a_blitear = [
+            (fondo_imagen, (0, 0)),  # Fondo
+            (texto_renderizado, (input_rect.x + 5, input_rect.y + 5)),  # Texto del usuario
+        ]
+        blitear_imagenes(ventana, elementos_a_blitear)
+
+        # Dibujar el rectángulo del cuadro de texto
+        pygame.draw.rect(ventana, color_actual, input_rect, 2)
+
+        # Manejar y mostrar el icono de volumen
+        volumen, mostrar_icono = ajustar_volumen(eventos, volumen)
         if mostrar_icono:
-            mostrar_icono_volumen(ventana, icono_volumen, mostrar_icono)
+            ventana.blit(icono_volumen, datos["posicion_icono_volumen"])
 
+        # Actualizar pantalla
         pygame.display.update()
-        pygame.time.delay(100)
+        pygame.time.Clock()
 
     return siguiente_pantalla

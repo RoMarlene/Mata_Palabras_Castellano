@@ -1,9 +1,14 @@
 import json
 import csv
 
-#Esta función crea el archivo "Palabras.csv" y guarda las palabras.
-#Recibe como parametro el diccionario de palabras.
+"""_summary_
 
+Args:
+    palabras_csv (str): Recibe el csv de las palabras pasado a una variable.
+
+Returns:
+    dict: Retorna dicho diccionario de palabras 
+"""
 def obtener_lista_palabras(palabras_csv: str) -> dict:
     diccionario_palabras = {
         "Faciles": {"Palabras": [], "Puntaje": 5},
@@ -36,8 +41,15 @@ def obtener_lista_palabras(palabras_csv: str) -> dict:
 
     return diccionario_palabras
 
-#Esta función crea el archivo "Estadisticas.csv" y guarda el nombre, el puntaje, el tiempo y las vidas.
-#Recibe como parametro los nombres, el puntaje, el tiempo y las vidas
+
+"""_summary_
+
+Args:
+    nombre (str): Nombre que pondrá el usuario.
+    puntaje (int): Puntaje del usuario.
+    tiempo (int): El tiempo del usuario.
+    vidas (int): Las vidas del usuario.
+"""
 def guardar_puntaje_json(nombre: str, puntaje: int, tiempo: int, vidas: int):
     datos = {
         "Nombre": nombre,
@@ -45,8 +57,7 @@ def guardar_puntaje_json(nombre: str, puntaje: int, tiempo: int, vidas: int):
         "Tiempo": tiempo, 
         "Vidas": vidas
     }
-    # usamos el try except , leemos el archivo y lo cargamos
-    #  en el except devolvemos una lista vacia
+
     try:
         with open("Estadisticas.json", "r") as archivo:
             estadisticas = json.load(archivo)
@@ -55,7 +66,5 @@ def guardar_puntaje_json(nombre: str, puntaje: int, tiempo: int, vidas: int):
         
     estadisticas.append(datos)
 
-# Leemos o creamos el archivo estadistica.json 
-#  y con el dump escribimos directamente sobre el archivo
     with open("Estadisticas.json", "w") as puntaje_file:
         json.dump(estadisticas, puntaje_file, indent=4)

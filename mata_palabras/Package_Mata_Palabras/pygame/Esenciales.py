@@ -1,15 +1,24 @@
 import pygame
 import random
-from Modulo_central import datos
+from Datos_juego import datos
 
-# Inicialización del tiempo al inicio del juego
+"""
+Inicialización del tiempo al inicio del juego
+"""
 def iniciar_temporizador():
     if datos["tiempo_inicio"] == None:
         datos["tiempo_inicio"] = pygame.time.get_ticks()
 
-#Crea el temporizador
-#Recibe la duracion total y el tiempo de inicio.
-#Devuelve el tiempo restante.
+
+"""
+Crea el temporizador.
+Args:
+    duracion_total (int): El tiempo total que dura el tiempo.
+    tiempo_inicio (int): El tiempo de inicio.
+
+Returns:
+    int: El tiempo restante.
+"""
 def crear_temporizador(duracion_total: int, tiempo_inicio: int)-> int:
     tiempo_actual = pygame.time.get_ticks()
     tiempo_transcurrido = (tiempo_actual - tiempo_inicio) // 1000
@@ -20,16 +29,29 @@ def crear_temporizador(duracion_total: int, tiempo_inicio: int)-> int:
 
     return tiempo_restante
 
-#Esta funcion resta las vidas.
-#Recibe la vida 
-#Retorna la nueva vida, o sea, la vida actualizada
+
+"""
+Esta funcion resta las vidas.
+Args:
+    vidas (int):L vida
+
+Returns:
+    int: Retorna la nueva vida, o sea, la vida actualizada
+"""
 def restar_vidas(vidas: int) -> int:
     nueva_vida = vidas - 1
     return nueva_vida
 
-#Verifica si colisiona con la linea
-#Recibe la lista de diccionarios de enemigos y la linea en la coordenada y
-#Devuelve un booleano
+"""
+    verifica si el "objeto" colisiona con la linea
+
+Args:
+    enemigos (list): La lista de enemigos
+    linea_y (int): Linea en posicion Y.
+
+Returns:
+    bool: La colisión detectada.
+"""
 def verificar_colision_con_linea(enemigos: list, linea_y: int)->bool:
     colision_detectada = False 
 
@@ -39,21 +61,34 @@ def verificar_colision_con_linea(enemigos: list, linea_y: int)->bool:
     
     return colision_detectada  
 
-#Muestra el temporizador
-def mostrar_temporizador(pantalla, tiempo_restante: int, posicion: int, color: tuple, tamaño_fuente:int):
-    fuente = pygame.font.Font(datos["path_fuente"], tamaño_fuente)  # Usa la fuente por defecto
-    texto_tiempo = fuente.render(f"{tiempo_restante}s", True, color)
-    pantalla.blit(texto_tiempo, posicion)
 
-#Muestra las vidas
-def mostrar_vidas(pantalla, vidas: int, posicion: int, color: tuple, tamaño_fuente: int):
-    fuente = pygame.font.Font(datos["path_fuente"], tamaño_fuente)  # Usa la fuente por defecto
-    vidas_texto = fuente.render(str(vidas), True, color)
-    pantalla.blit(vidas_texto, posicion)
+def mostrar_texto(pantalla, texto: str, posicion: tuple, color: tuple, tamaño_fuente: int):
+    """
+    Muestra texto genérico en la pantalla.
 
-#calcula el puntaje.
-#Recibe el diccionario, el puntaje y la palabra
-#Retorna el puntaje actualizado
+    Args:
+        pantalla (pygame.Surface): Superficie donde se dibujará el texto.
+        texto (str): Texto a mostrar.
+        posicion (tuple): Posición (x, y) donde se ubicará el texto.
+        color (tuple): Color del texto en formato RGB.
+        tamaño_fuente (int): Tamaño de la fuente.
+    """
+    texto = str(texto)
+    fuente = pygame.font.Font(datos["path_fuente"], tamaño_fuente)  # Usa la fuente configurada
+    texto_renderizado = fuente.render(texto, True, color)
+    pantalla.blit(texto_renderizado, posicion)
+
+"""
+Calcula el puntaje.
+
+Args:
+    diccionario (dict): El diccionario del csv.
+    puntaje (int): El puntaje.
+    palabra (str): La palabra.
+
+Returns:
+    int: El puntaje actualizado.
+"""
 def calcular_puntaje(diccionario: dict, puntaje: int, palabra: str) -> int:
     puntaje_actualizado = puntaje
     for clave in diccionario:
@@ -64,31 +99,54 @@ def calcular_puntaje(diccionario: dict, puntaje: int, palabra: str) -> int:
                 break  
     return puntaje_actualizado
 
-#muestra el puntaje
-def mostrar_puntaje(pantalla, puntaje: int, posicion: int, color: tuple, tamaño_fuente: int):
-    fuente = pygame.font.Font(datos["path_fuente"], tamaño_fuente) 
-    puntaje_texto = fuente.render(str(puntaje), True, color)
-    pantalla.blit(puntaje_texto, posicion)
 
-#Muestra un mensaje con fondo transparente
-#Recibe la pantalla, el mensaje, la posicion, el color del fondo, el color del texto y la fuente
-def mostrar_mensaje_con_fondo(pantalla, mensaje: str, posicion: tuple, color_fondo: tuple, color_texto: tuple, fuente: str):
+def mostrar_mensaje_con_fondo(pantalla, mensaje: str, posicion: tuple, color_fondo: tuple, color_texto: tuple, fuente):
+    """
+    Dibuja un mensaje con un fondo semitransparente en la pantalla.
+
+    Args:
+        pantalla (pygame.Surface): La superficie donde se dibujará el mensaje.
+        mensaje (str): El texto que se mostrará en pantalla.
+        posicion (tuple): Coordenadas (x, y) de la esquina superior izquierda del fondo.
+        color_fondo (tuple): Color del fondo en formato RGB.
+        color_texto (tuple): Color del texto en formato RGB.
+        fuente (pygame.font.Font): Fuente utilizada para renderizar el texto.
+    """
+    # Renderiza el texto
     texto = fuente.render(mensaje, True, color_texto)
 
-    # Crear el fondo transparente con un margen
-    margen = 10
-    fondo = pygame.Surface((texto.get_width() + margen * 2, texto.get_height() + margen * 2), pygame.SRCALPHA) #canal alfa, transparencia
-    fondo.fill((*color_fondo, 70))
+    if color_fondo:  # Si hay un color de fondo especificado
+        margen = 10
+        fondo = pygame.Surface((texto.get_width() + margen * 2, texto.get_height() + margen * 2), pygame.SRCALPHA)
+        fondo.fill((*color_fondo, 70))  # Fondo semitransparente
+        pantalla.blit(fondo, posicion)
 
-    pantalla.blit(fondo, posicion)
+        # Centrar el texto dentro del fondo
+        rect_texto = texto.get_rect(center=(posicion[0] + fondo.get_width() // 2, posicion[1] + fondo.get_height() // 2))
+    else:
+        # Posición directa del texto sin fondo
+        rect_texto = texto.get_rect(topleft=posicion)
 
-    # Colocar el texto centrado dentro del fondo
-    rect_texto = texto.get_rect(center=(posicion[0] + fondo.get_width() // 2, posicion[1] + fondo.get_height() // 2))
     pantalla.blit(texto, rect_texto)
 
-#Esta función obtiene la palabra del diccionario.
-#Recibe el diccionario y la palabra seleccionada
-#Retorna un diccionario
+"""
+Selecciona una palabra del diccionario según la categoría basada en el tiempo restante.
+
+Dependiendo del tiempo restante, selecciona una palabra de la categoría correspondiente:
+- "Faciles" si el tiempo es mayor a 45 segundos.
+- "Medias" si el tiempo es mayor a 30 segundos pero menor o igual a 45 segundos.
+- "Dificiles" si el tiempo es menor o igual a 30 segundos.
+
+Además, evita palabras previamente seleccionadas para evitar repeticiones.
+
+Args:
+    tiempo_restante (int): Tiempo restante en el juego.
+    diccionario_palabras (dict): Diccionario que contiene palabras categorizadas y sus puntajes.
+    palabras_seleccionadas (list): Lista de palabras que ya se seleccionaron previamente.
+
+Returns:
+    dict: Contiene la categoría de la palabra, la palabra seleccionada, y su puntaje asociado.
+"""
 def obtener_palabra(tiempo_restante: int, diccionario_palabras: dict, palabras_seleccionadas: list)-> dict:
     if tiempo_restante > 45: 
         categoria = "Faciles"

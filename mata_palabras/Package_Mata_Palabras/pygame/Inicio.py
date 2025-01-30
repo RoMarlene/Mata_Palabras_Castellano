@@ -1,40 +1,33 @@
 import pygame
-from Datos_juego import imagenes, sonidos, DIMENSIONES_PANTALLA
+from Datos_juego import imagenes, sonidos, DIMENSIONES_PANTALLA, mensajes, posiciones, datos
+from Funciones import manejar_eventos_generales, inicializar_pantalla
 
 def crear_inicio_juego():
-    pygame.init()
-    pygame.mixer.init()
+    ventana, imagen_inicio, fuente_inicio, color_fuente = inicializar_pantalla(
+        titulo="Inicio",
+        icono=imagenes["Icono"],
+        fondo=imagenes["Fondo_inicio"],
+        fuente_config=("Arial", 30),
+        color_fuente=datos["BLANCO"],
+        musica=sonidos["sonido_inicio"],
+        volumen=datos["volumen_predefinido"]
+    )
 
-    ventana_inicio = pygame.display.set_mode(DIMENSIONES_PANTALLA)
-    pygame.display.set_caption("Inicio")
-
-    imagen_inicio = pygame.image.load(imagenes["Fondo_inicio"])
-
-    sonido_inicio = pygame.mixer.Sound(sonidos["sonido_inicio"])
-    sonido_inicio.play(loops=-1)
-
-    fuente_inicio = pygame.font.SysFont("Arial", 30)
-    texto_inicio = fuente_inicio.render("Presiona ENTER para empezar el juego", True, (255, 255, 255))
-
-    siguiente_pantalla = "inicio"
+    texto_inicio = fuente_inicio.render(mensajes["mensaje_inicio"], True, color_fuente)
 
     bandera_inicio = True
+    siguiente_pantalla = "inicio"
+
     while bandera_inicio:
-        ventana_inicio.blit(imagen_inicio, (0, 0))
-        ventana_inicio.blit(texto_inicio, (183, 531))
+        ventana.blit(imagen_inicio, (0, 0))
+        ventana.blit(texto_inicio, posiciones["posicion_mensaje_inicio"])
 
+        eventos = pygame.event.get()
+        bandera_inicio, siguiente_pantalla, _, _ = manejar_eventos_generales(eventos, contexto="inicio")
 
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                siguiente_pantalla = "salir"
-                bandera_inicio = False
-            elif evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_RETURN:
-                    siguiente_pantalla = "juego"
-                    bandera_inicio = False
-                    sonido_inicio.stop()
+        if siguiente_pantalla == "juego":
+            pygame.mixer.music.stop()  # Detiene la música al salir
 
         pygame.display.update()
-
 
     return siguiente_pantalla
