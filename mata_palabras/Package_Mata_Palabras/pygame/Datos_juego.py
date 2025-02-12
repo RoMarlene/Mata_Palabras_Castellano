@@ -37,19 +37,14 @@ datos = {
     "tiempo_extra": 10,
     "mensaje_comodin": "",  
     "tiempo_inicio_mensaje_comodin": 0,  
-    "tiempo_congelado": False,
-    "tiempo_restante_congelacion": 0,  
     "multiplicador_puntos": 1,
     "palabras_multiplicadas": 0,
     "esperando_palabra": False,
     "palabra_acertada": False,
     "mostrar_mensaje_sin_comodines": False,
     "tiempo_inicio_mensaje_sin_comodines": 0,
-    
-    # 🔥 Nuevo control para mostrar primero el mensaje del último comodín
     "mostrar_mensaje_ultimo_comodin": False,
     "tiempo_inicio_mensaje_ultimo_comodin": 0,
-    "cooldown_mensaje_sin_comodines": 0
 }
 
 
@@ -93,7 +88,6 @@ sonidos = {
 mensajes = {
     "tiempo_agotado": "¡Se acabó el tiempo! :(",
     "vidas_agotadas": "¡Se acabaron las vidas! Perdiste.",
-    "sin_comodines": "¡Ya no hay comodines disponibles!",
     "mensaje_final": "¡Nombre guardado!",
     "mensaje_inicio": "Presiona ENTER para empezar el juego",
     "mensaje_tiempo_extra": "¡Comodín usado! Tiempo extra añadido",

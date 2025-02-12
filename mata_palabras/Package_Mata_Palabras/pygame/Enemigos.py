@@ -3,19 +3,19 @@ import random
 from Datos_juego import datos
 from Esenciales import *
 
-"""_summary_
-
-Args:
-    DIMENSIONES_PANTALLA (tuple): La dimensión de la pantalla.
-    numero_enemigos (int): El número de enemigos.
-    tiempo_restante (int): El tiempo restante.
-    diccionario_palabras (dict): El diccionario de palabras.
-    palabras_seleccionadas (str): Las palabras que fueron seleccionadas.
-
-Returns:
-    list: La lista de enemigos.
-"""
 def crear_enemigos(DIMENSIONES_PANTALLA: tuple, numero_enemigos: int, tiempo_restante:int, diccionario_palabras:dict, palabras_seleccionadas: str)-> list:
+    """Crea los enemigos.
+
+    Args:
+        DIMENSIONES_PANTALLA (tuple): La dimensión de la pantalla.
+        numero_enemigos (int): El número de enemigos.
+        tiempo_restante (int): El tiempo restante.
+        diccionario_palabras (dict): El diccionario de palabras.
+        palabras_seleccionadas (str): Las palabras que fueron seleccionadas.
+
+    Returns:
+        list: La lista de enemigos.
+    """
     enemigos = []
     for i in range(numero_enemigos):
         palabra_info = obtener_palabra(tiempo_restante, diccionario_palabras, palabras_seleccionadas)
@@ -35,35 +35,36 @@ def crear_enemigos(DIMENSIONES_PANTALLA: tuple, numero_enemigos: int, tiempo_res
         palabras_seleccionadas.append(palabra_info["Palabra"])
     return enemigos
 
-"""_summary_
-Actualiza la posición de los enemigos.
-Args:
-    enemigos (list): La lista de enemigos
-    dimensiones_pantalla (tuple): La dimension de la pantalla.
-"""
 def actualizar_posiciones_enemigos(enemigos: list, dimensiones_pantalla: tuple):
+    """
+    Actualiza la posición de los enemigos.
+    Args:
+        enemigos (list): La lista de enemigos
+        dimensiones_pantalla (tuple): La dimension de la pantalla.
+    """
     for enemigo in enemigos:
         enemigo["y"] += enemigo["velocidad"]
         if enemigo["y"] > dimensiones_pantalla[1]:
             enemigos.remove(enemigo)
 
-"""_summary_
-
-Args:
-    ventana (pygame.Surface): Superficie donde se dibujarán los enemigos (la ventana principal del juego).
-    enemigos (list): La lista de enemigos.
-    fuente (str): La fuente que utilizarán los enemigos
-    color_texto (tuple): El color de texto que tendrán los enemigos
-"""
 def dibujar_enemigos(ventana: pygame.Surface, enemigos: list, fuente: str, color_texto: tuple):
+    """
+    Dibuja los enemigos en pantalla
+
+    Args:
+        ventana (pygame.Surface): Superficie donde se dibujarán los enemigos (la ventana principal del juego).
+        enemigos (list): La lista de enemigos.
+        fuente (str): La fuente que utilizarán los enemigos
+        color_texto (tuple): El color de texto que tendrán los enemigos
+    """
     fuente = pygame.font.Font(datos["path_fuente"], 25)
     for enemigo in enemigos:
         texto_palabra = fuente.render(enemigo["palabra"], True, color_texto)
         ventana.blit(texto_palabra, (enemigo["x"], enemigo["y"]))
 
 
-def verificar_solapamiento(enemigo:dict, posiciones_ocupadas:tuple, distancia_minima: int=160):
-    """_summary_
+def verificar_solapamiento(enemigo:dict, posiciones_ocupadas:tuple, distancia_minima: int=170):
+    """Evita que las palabras se solapen (no mucho)
 
     Args:
         enemigo (dict): La lista de enmigos
@@ -71,7 +72,7 @@ def verificar_solapamiento(enemigo:dict, posiciones_ocupadas:tuple, distancia_mi
         distancia_minima (int, optional): La distancia minima. Por defecto es 160.
 
     Returns:
-        _type_: _description_
+        bool: Retorna el solapamiento.
     """
     solapamiento = False 
     for x, y in posiciones_ocupadas:

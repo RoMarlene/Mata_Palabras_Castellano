@@ -1,5 +1,11 @@
 [
     {
+        "Nombre": "Rochi",
+        "Puntaje": "00330",
+        "Tiempo": 46,
+        "Vidas": 0
+    },
+    {
         "Nombre": "Tukiii",
         "Puntaje": "00240",
         "Tiempo": 35,

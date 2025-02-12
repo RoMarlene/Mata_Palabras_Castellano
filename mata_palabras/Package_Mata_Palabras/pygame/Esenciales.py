@@ -2,59 +2,56 @@ import pygame
 import random
 from Datos_juego import datos
 
-"""
-Inicialización del tiempo al inicio del juego
-"""
 def iniciar_temporizador():
+    """
+    Inicialización del tiempo al inicio del juego
+    """
     if datos["tiempo_inicio"] == None:
         datos["tiempo_inicio"] = pygame.time.get_ticks()
 
 
-"""
-Crea el temporizador.
-Args:
-    duracion_total (int): El tiempo total que dura el tiempo.
-    tiempo_inicio (int): El tiempo de inicio.
+def crear_temporizador(duracion_total: int, tiempo_inicio: int)-> int:
+    """
+    Crea el temporizador.
+    Args:
+        duracion_total (int): El tiempo total que dura el tiempo.
+        tiempo_inicio (int): El tiempo de inicio.
 
-Returns:
-    int: El tiempo restante.
-"""
-def crear_temporizador(duracion_total, tiempo_inicio, datos):
+    Returns:
+        int: El tiempo restante.
+    """
     tiempo_actual = pygame.time.get_ticks()
-
-    if datos["tiempo_congelado"]:  
-        tiempo_restante = datos["tiempo_restante_congelacion"]  # Mantiene el tiempo congelado
-    else:
-        tiempo_restante = duracion_total - (tiempo_actual - tiempo_inicio) // 1000  # Calcula tiempo normal
-
+    tiempo_transcurrido = (tiempo_actual - tiempo_inicio) // 1000
+    tiempo_restante = duracion_total - tiempo_transcurrido
+    
     if tiempo_restante < 0:
         tiempo_restante = 0
 
     return tiempo_restante
 
-"""
-Esta funcion resta las vidas.
-Args:
-    vidas (int):L vida
-
-Returns:
-    int: Retorna la nueva vida, o sea, la vida actualizada
-"""
 def restar_vidas(vidas: int) -> int:
+    """
+    Esta funcion resta las vidas.
+    Args:
+        vidas (int):L vida
+
+    Returns:
+        int: Retorna la nueva vida, o sea, la vida actualizada
+    """
     nueva_vida = vidas - 1
     return nueva_vida
 
-"""
-    verifica si el "objeto" colisiona con la linea
-
-Args:
-    enemigos (list): La lista de enemigos
-    linea_y (int): Linea en posicion Y.
-
-Returns:
-    bool: La colisión detectada.
-"""
 def verificar_colision_con_linea(enemigos: list, linea_y: int)->bool:
+    """
+        verifica si el "objeto" colisiona con la linea
+
+    Args:
+        enemigos (list): La lista de enemigos
+        linea_y (int): Linea en posicion Y.
+
+    Returns:
+        bool: La colisión detectada.
+    """
     colision_detectada = False 
 
     for enemigo in enemigos:
@@ -80,18 +77,18 @@ def mostrar_texto(pantalla, texto: str, posicion: tuple, color: tuple, tamaño_f
     texto_renderizado = fuente.render(texto, True, color)
     pantalla.blit(texto_renderizado, posicion)
 
-"""
-Calcula el puntaje.
-
-Args:
-    diccionario (dict): El diccionario del csv.
-    puntaje (int): El puntaje.
-    palabra (str): La palabra.
-
-Returns:
-    int: El puntaje actualizado.
-"""
 def calcular_puntaje(diccionario: dict, puntaje: int, palabra: str) -> int:
+    """
+    Calcula el puntaje.
+
+    Args:
+        diccionario (dict): El diccionario del csv.
+        puntaje (int): El puntaje.
+        palabra (str): La palabra.
+
+    Returns:
+        int: El puntaje actualizado.
+    """
     puntaje_actualizado = puntaje
     for clave in diccionario:
         lista_palabras = diccionario[clave]["Palabras"]
@@ -131,25 +128,25 @@ def mostrar_mensaje_con_fondo(pantalla, mensaje: str, posicion: tuple, color_fon
 
     pantalla.blit(texto, rect_texto)
 
-"""
-Selecciona una palabra del diccionario según la categoría basada en el tiempo restante.
-
-Dependiendo del tiempo restante, selecciona una palabra de la categoría correspondiente:
-- "Faciles" si el tiempo es mayor a 45 segundos.
-- "Medias" si el tiempo es mayor a 30 segundos pero menor o igual a 45 segundos.
-- "Dificiles" si el tiempo es menor o igual a 30 segundos.
-
-Además, evita palabras previamente seleccionadas para evitar repeticiones.
-
-Args:
-    tiempo_restante (int): Tiempo restante en el juego.
-    diccionario_palabras (dict): Diccionario que contiene palabras categorizadas y sus puntajes.
-    palabras_seleccionadas (list): Lista de palabras que ya se seleccionaron previamente.
-
-Returns:
-    dict: Contiene la categoría de la palabra, la palabra seleccionada, y su puntaje asociado.
-"""
 def obtener_palabra(tiempo_restante: int, diccionario_palabras: dict, palabras_seleccionadas: list)-> dict:
+    """
+    Selecciona una palabra del diccionario según la categoría basada en el tiempo restante.
+
+    Dependiendo del tiempo restante, selecciona una palabra de la categoría correspondiente:
+    - "Faciles" si el tiempo es mayor a 45 segundos.
+    - "Medias" si el tiempo es mayor a 30 segundos pero menor o igual a 45 segundos.
+    - "Dificiles" si el tiempo es menor o igual a 30 segundos.
+
+    Además, evita palabras previamente seleccionadas para evitar repeticiones.
+
+    Args:
+        tiempo_restante (int): Tiempo restante en el juego.
+        diccionario_palabras (dict): Diccionario que contiene palabras categorizadas y sus puntajes.
+        palabras_seleccionadas (list): Lista de palabras que ya se seleccionaron previamente.
+
+    Returns:
+        dict: Contiene la categoría de la palabra, la palabra seleccionada, y su puntaje asociado.
+    """
     if tiempo_restante > 45: 
         categoria = "Faciles"
     elif tiempo_restante > 30:  

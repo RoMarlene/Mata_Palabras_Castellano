@@ -7,23 +7,23 @@ from Disaster import *
 from Linea import crear_linea
 from Comodines import *
 
-"""
-Configura e inicializa los recursos para una pantalla genérica.
-Devuelve los objetos necesarios para usar en el juego.
+def inicializar_pantalla(titulo, icono, fondo, fuente_config, color_fuente, musica=None, volumen=0.5)-> tuple:
+    """
+    Configura e inicializa los recursos para una pantalla genérica.
+    Devuelve los objetos necesarios para usar en el juego.
 
-Args:
-    titulo (str): Título de la ventana.
-    icono (str): Ruta al ícono de la ventana.
-    fondo (str): Ruta a la imagen de fondo.
-    fuente_config (tuple): Configuración de fuente (nombre, tamaño).
-    color_fuente (tuple): Color del texto.
-    musica (str, opcional): Ruta al archivo de música.
-    volumen (float, opcional): Volumen de la música.
+    Args:
+        titulo (str): Título de la ventana.
+        icono (str): Ruta al ícono de la ventana.
+        fondo (str): Ruta a la imagen de fondo.
+        fuente_config (tuple): Configuración de fuente (nombre, tamaño).
+        color_fuente (tuple): Color del texto.
+        musica (str, opcional): Ruta al archivo de música.
+        volumen (float, opcional): Volumen de la música.
 
-Returns:
-    ventana, fondo_imagen, fuente, color_fuente
-"""
-def inicializar_pantalla(titulo, icono, fondo, fuente_config, color_fuente, musica=None, volumen=0.5):
+    Returns:
+        ventana, fondo_imagen, fuente, color_fuente
+    """
     pygame.init()
     pygame.mixer.init()
 
@@ -38,7 +38,7 @@ def inicializar_pantalla(titulo, icono, fondo, fuente_config, color_fuente, musi
     fondo_imagen = pygame.image.load(fondo)
 
     # Configuración de la fuente
-    nombre_fuente, tamaño_fuente = fuente_config  # Asegúrate de que fuente_config sea una tupla (nombre, tamaño)
+    nombre_fuente, tamaño_fuente = fuente_config 
     fuente = pygame.font.SysFont(nombre_fuente, tamaño_fuente)
 
     if musica:
@@ -48,7 +48,20 @@ def inicializar_pantalla(titulo, icono, fondo, fuente_config, color_fuente, musi
 
     return ventana, fondo_imagen, fuente, color_fuente
 
-def manejar_boton(evento, boton, sonido, contexto, nombre_boton):
+def manejar_boton(evento: pygame.event, boton: dict, sonido: pygame.mixer.Sound, contexto: str, nombre_boton:str)-> str:
+    """
+    Esta funcion maneja los botones para ir a las diferentes ventanas
+
+    Args:
+        evento (pygame.event): El evento
+        boton (dict): El boton
+        sonido (pygame.mixer.Sound): El sonido del boton
+        contexto (str):  Cual pantalla es 
+        nombre_boton (str): El nombre del boton
+
+    Returns:
+        str: Retorna la siguiente pantalla
+    """
     siguiente_pantalla = None  
 
     # Verificar que se haya hecho clic en el botón
@@ -70,7 +83,18 @@ def manejar_boton(evento, boton, sonido, contexto, nombre_boton):
 
     return siguiente_pantalla
 
-def manejar_colores_cuadro_texto(activo, color_activo, color_inactivo):
+def manejar_colores_cuadro_texto(activo: bool, color_activo: tuple, color_inactivo: tuple) -> tuple:
+    """
+    Esta funcion maneja los colores del cuadro de texto!
+
+    Args:
+        activo (bool): Si el cuadro esta activo
+        color_activo (tuple): El color dle cuadro si esta activo
+        color_inactivo (tuple): El color del cuadro si esta inactivo
+
+    Returns:
+        tuple: El color actual que tendrá el cuadro de texto
+    """
     if activo:
         color_actual = color_activo
     else:
@@ -78,7 +102,7 @@ def manejar_colores_cuadro_texto(activo, color_activo, color_inactivo):
 
     return color_actual
 
-def manejar_eventos_generales(eventos, contexto, activo=False, texto_actual="", input_rect=None, botones=None):
+def manejar_eventos_generales(eventos, contexto, activo=False, texto_actual="", input_rect=None, botones=None)-> tuple:
     """
     Maneja eventos generales según el contexto de la pantalla.
     Devuelve una acción, el nuevo estado de la bandera y la siguiente pantalla.
@@ -137,29 +161,43 @@ def manejar_eventos_generales(eventos, contexto, activo=False, texto_actual="", 
                             break
 
     return bandera, siguiente_pantalla, texto_actual, activo
-"""
-Blitea múltiples imágenes en la ventana.
 
-Args:
-    ventana: La superficie principal donde se dibujarán los elementos.
-    elementos: Una lista de tuplas con el formato:
-        [(imagen, posición), (imagen, posición), ...]
-        - imagen: Superficie de Pygame (puede ser texto renderizado o imagen cargada).
-        - posición: Tupla con las coordenadas (x, y) donde se bliteará la imagen.
-"""
 def blitear_imagenes(ventana, elementos):
+    """
+    Blitea múltiples imágenes en la ventana.
+
+    Args:
+        ventana: La superficie principal donde se dibujarán los elementos.
+        elementos: Una lista de tuplas con el formato:
+            [(imagen, posición), (imagen, posición), ...]
+            - imagen: Superficie de Pygame (puede ser texto renderizado o imagen cargada).
+            - posición: Tupla con las coordenadas (x, y) donde se bliteará la imagen.
+    """
     for imagen, posicion in elementos:
         ventana.blit(imagen, posicion)
 
-def manejar_eventos_juego(eventos, contexto, boton_volver, fuente, ventana, reloj, puntaje_actual,  
-                        comodin_activo=False, tiempo_congelamiento=0, TIEMPO_CONGELADO=0, datos=None, mensajes=None):
+def manejar_eventos_juego(eventos: pygame.event, boton_volver: str, fuente:str, ventana: pygame, reloj:int, puntaje_actual:int,  
+                    datos=None, mensajes=None) -> tuple:
     """
     Maneja los eventos del juego, incluyendo eventos de teclado, ratón, lógica de comodines y entrada de palabras.
-    """
+
+    Args:
+        eventos (pygame.event): El evento
+        boton_volver (str): El boton de volver
+        fuente (str): La fuente
+        ventana (pygame): La ventana
+        reloj (int): Controla el tiempo
+        puntaje_actual (int): El puntaje actual
+        datos (_type_, optional): Los datos. Defaults to None.
+        mensajes (_type_, optional): Los mensajes. Defaults to None.
+
+    Returns:
+        tuple: retorna la bandera del juego, la siguiente pantalla y el tiempo restante
+        """
     bandera_juego = True
     siguiente_pantalla = None
-    tiempo_restante = 0  # 🔴 Inicializamos en 0 para evitar valores None
-    texto_ingresado = ""  # 📌 Acumulador de texto ingresado por el usuario
+    tiempo_restante = 0  # Inicializamos en 0 para evitar valores None
+    texto_ingresado = ""  # Acumulador de texto ingresado por el usuario
 
     for evento in eventos:
         if evento.type == pygame.QUIT:
@@ -171,29 +209,27 @@ def manejar_eventos_juego(eventos, contexto, boton_volver, fuente, ventana, relo
                 bandera_juego = False
 
         elif evento.type == pygame.KEYDOWN:
-            # 🔥 Manejar uso de comodines
-            resultado = manejar_comodines(evento, datos, tiempo_restante, tiempo_congelamiento, TIEMPO_CONGELADO, ventana, mensajes, fuente, reloj)
+            # Manejar uso de comodines
+            resultado = manejar_comodines(evento, datos, tiempo_restante, ventana, mensajes, fuente)
             
             try:
-                tiempo_restante, inicio_congelamiento, comodin_usado = resultado
-            except ValueError:
-                tiempo_restante, inicio_congelamiento = resultado, 0
+                tiempo_restante, comodin_usado = resultado
+            except:
+                tiempo_restante = resultado, 0
                 comodin_usado = False
 
             if comodin_usado:
-                continue  # Saltamos el resto de la lógica si se usó un comodín
+                continue 
 
-            # 📌 Captura de texto del usuario
+            # Captura de texto del usuario
             if evento.key == pygame.K_RETURN:  # Si presiona Enter, validar palabra
                 palabra_correcta = validar_palabra(texto_ingresado, datos, diccionario_palabras, datos["vida"], puntaje_actual)
 
                 if palabra_correcta:
-                    print(f"🎯 ¡Palabra correcta: {texto_ingresado}!")
-
-                    # 🔥 Si el comodín de duplicador está activo, forzar recursión explícita
+                    # Si el comodín de duplicador está activo, forzar recursión explícita
                     if datos["multiplicador_puntos"] == 2 and datos["esperando_palabra"]:
-                        datos["esperando_palabra"] = False  # 🔄 Resetear la espera
-                        comodin_duplicar_puntos(10)  # ✅ 🔥 Recursión explícita ocurre aquí
+                        datos["esperando_palabra"] = False  # Resetear la espera
+                        comodin_duplicar_puntos(10)
 
                     puntaje_actual = calcular_puntaje(diccionario_palabras, puntaje_actual, texto_ingresado)
 
@@ -205,8 +241,8 @@ def manejar_eventos_juego(eventos, contexto, boton_volver, fuente, ventana, relo
             else:
                 texto_ingresado += evento.unicode  # Agregar letra a la palabra
 
-    # ✅ Evita que el tiempo quede en None
-    tiempo_restante = crear_temporizador(datos["duracion_total"], datos["tiempo_inicio"], datos)
+    # Evita que el tiempo quede en None
+    tiempo_restante = crear_temporizador(datos["duracion_total"], datos["tiempo_inicio"])
     if tiempo_restante == None:
         tiempo_restante = 0  
 
@@ -215,22 +251,48 @@ def manejar_eventos_juego(eventos, contexto, boton_volver, fuente, ventana, relo
     return bandera_juego, siguiente_pantalla, tiempo_restante
 
 
-def gestionar_temporizador(evento, datos, tiempo_restante, diccionario_mensajes, fuente, pantalla):
+def gestionar_temporizador(evento: pygame.event, datos: dict, tiempo_restante: int, diccionario_mensajes:dict)-> tuple:
     """
+    
     Maneja la activación del temporizador y evita que se use el comodín dos veces.
+
+    Args:
+        evento (pygame.event): El evento
+        datos (dict): El diccionario de datos
+        tiempo_restante (int): El tiempo restante_
+        diccionario_mensajes (dict): El diccionario de mensajes
+
+    Returns:
+        tuple: Retorna el tiempo restante y el tiempo inicio actualizado.
     """
     if evento.type == pygame.KEYDOWN:
         if evento.key == TECLAS_JUEGO["comodin_tiempo"]:
             if datos["comodin_tiempo_disponible"]:
-                datos = activar_comodin_tiempo(datos, datos["tiempo_inicio"], diccionario_mensajes, fuente, pantalla, datos["BLANCO"])
+                datos = activar_comodin_tiempo(datos, diccionario_mensajes)
     
     tiempo_restante = calcular_tiempo_restante(datos)
     return tiempo_restante, datos["tiempo_inicio"]
 
-def verificar_juego_terminado(juego_terminado, vidas, ventana, imagen_fondo_juego, mensajes, color_texto, fuente, puntaje_actual, datos, tiempo_restante):
+def verificar_juego_terminado(juego_terminado: bool, vidas: int, ventana: pygame, imagen_fondo_juego:str, mensajes: dict, 
+    color_texto: tuple[int, int, int], fuente, puntaje_actual: int, datos: dict, tiempo_restante: int) -> dict:
     """
     Verifica si el juego ha terminado y prepara los datos para la función de finalizar el juego.
     Devuelve un diccionario con los datos necesarios para crear la pantalla final.
+
+    Args:
+        juego_terminado (bool): Si el juego esta terminado
+        vidas (int): _Las vidas
+        ventana (pygame): La ventana
+        imagen_fondo_juego (str): La imagen de fondo del juego
+        mensajes (dict): El diccionario de mensajes
+        color_texto (tuple[int, int, int]): El color del texto
+        fuente (_type_): La fuente del texto
+        puntaje_actual (int): El puntaje actual
+        datos (dict): el diccionario de datos
+        tiempo_restante (int): El tiempo restante
+
+    Returns:
+        dict: Los datos necesarios para la pantalla final.
     """
     resultado = {
         "juego_terminado": False,
@@ -242,7 +304,7 @@ def verificar_juego_terminado(juego_terminado, vidas, ventana, imagen_fondo_jueg
         pygame.display.flip()
         pygame.time.wait(3000)  # Espera de 3 segundos
 
-        # Preparar los datos para la función crear_final
+        # Preparar los datos para la ventana final.
         resultado["juego_terminado"] = True
         resultado["datos_finales"] = {
             "puntaje_actual": puntaje_actual,
@@ -252,92 +314,91 @@ def verificar_juego_terminado(juego_terminado, vidas, ventana, imagen_fondo_jueg
     
     return resultado
 
-def dibujar_rectangulo_texto(ventana, color_actual, input_rect,fuente, texto_usuario):
+def dibujar_rectangulo_texto(ventana: pygame.Surface, color_actual: tuple[int, int, int], input_rect: pygame.Rect, 
+                            fuente: pygame.font.Font, texto_usuario: str):
+    """
+    Dibuja el rectangulo de texto
+
+    Args:
+        ventana (pygame.Surface): La ventana
+        color_actual (tuple[int, int, int]): El color actual
+        input_rect (pygame.Rect): El rectangulo en si 
+        fuente (pygame.font.Font): La fuente
+        texto_usuario (str): El texto del usuario
+    """
     pygame.draw.rect(ventana, color_actual, input_rect, 2)
     texto_renderizado = fuente.render(texto_usuario, True, datos["BLANCO"])
     ventana.blit(texto_renderizado, (input_rect.x + 5, input_rect.y + 5))
 
-def manejar_comodines(evento, datos, tiempo_restante, inicio_congelamiento, TIEMPO_CONGELADO, ventana, mensajes, fuente, reloj):
+def manejar_comodines(evento: pygame.event, datos:dict, tiempo_restante: int, ventana: pygame.Surface, mensajes:dict, fuente:pygame.font)-> tuple:
     """
     Maneja los comodines del juego: tiempo extra, vida extra y duplicador de puntos.
     """
-    comodin_usado = False  # ✅ Inicialmente, no se usó ningún comodín
-
+    comodin_usado = False 
     if evento.type == pygame.KEYDOWN:
         tecla_presionada = evento.key
 
         tecla_comodin_tiempo = TECLAS_JUEGO["comodin_tiempo"]
         tecla_comodin_vida = TECLAS_JUEGO["comodin_vida"]
-        tecla_comodin_duplicador = TECLAS_JUEGO["comodin_puntaje_doble"]  # Ahora es duplicador
+        tecla_comodin_duplicador = TECLAS_JUEGO["comodin_puntaje_doble"]
 
         if tecla_presionada == tecla_comodin_tiempo:
             match tecla_presionada:
                 case tecla_comodin_tiempo:
-                    print(f"DEBUG: mensajes dentro de gestionar_temporizador = {mensajes}")
                     tiempo_restante, _ = gestionar_temporizador(
                         evento=evento,
                         datos=datos,
                         tiempo_restante=tiempo_restante,
                         diccionario_mensajes=mensajes,
-                        fuente=fuente,
-                        pantalla=ventana
                     )
-                    comodin_usado = True  # ✅ Se usó un comodín
+                    comodin_usado = True
 
         elif tecla_presionada == tecla_comodin_vida:
             match tecla_presionada:
                 case tecla_comodin_vida:
-                    print(f"DEBUG: mensajes dentro de vida = {mensajes}")
                     datos = activar_comodin_vida(
                         diccionario_juego=datos,
-                        diccionario_mensajes=mensajes,
-                        fuente=fuente,
-                        pantalla=ventana,
-                        color_texto=(255, 255, 255)
+                        diccionario_mensajes=mensajes
                     )
-                    comodin_usado = True  # ✅ Se usó un comodín
+                    comodin_usado = True
 
         elif tecla_presionada == tecla_comodin_duplicador:
             match tecla_presionada:
                 case tecla_comodin_duplicador:
                     if datos["comodin_duplicador_disponible"]:
-                        print("🟢 Activando comodín de puntos dobles...")
                         datos["multiplicador_puntos"] = 2
                         datos["palabras_multiplicadas"] = 0
                         datos["comodin_duplicador_disponible"] = False
 
-                        # 🔥 Llamar al comodín para que comience su efecto
                         comodin_duplicar_puntos(10)  
-                        comodin_usado = True  # ✅ Se usó un comodín
+                        comodin_usado = True 
 
             if comodin_usado:
                 datos["comodines_disponibles"] -= 1
-                print(f"🔥 Comodín usado, quedan: {datos['comodines_disponibles']}")
                 if datos["comodines_disponibles"] == 0:
                     datos["tiempo_inicio_mensaje_ultimo_comodin"] = pygame.time.get_ticks()
                     datos["mostrar_mensaje_ultimo_comodin"] = True
-                    print("🟠 Mostrando mensaje de último comodín.")
 
-    return tiempo_restante, inicio_congelamiento, comodin_usado
+    return tiempo_restante, comodin_usado
 
 def inicializar_variables(ventana):
     datos["multiplicador_puntos"] = 1
     datos["palabras_multiplicadas"] = 0
     datos["vida"] = 3
-    datos["comodin_vida_extra"] = True  # 🔄 Reactivar el comodín de vida
+    datos["comodin_vida_extra"] = True  
     datos["comodines_disponibles"] = 3
-    datos["comodin_tiempo_disponible"] = True  # ✅ Asegurar que el comodín de tiempo esté disponible
-    datos["comodin_duplicador_disponible"] = True  # ✅ Reiniciar el comodín de duplicación
+    datos["comodin_tiempo_disponible"] = True  
+    datos["comodin_duplicador_disponible"] = True  
     datos["tiempo_extra"] = 10
     datos["duracion_total"] = 60
-    datos["tiempo_inicio"] = None  # Reiniciar el tiempo de inicio
+    datos["tiempo_inicio"] = None
     multiplicador_puntos = datos["multiplicador_puntos"]
     palabras_multiplicadas = datos["palabras_multiplicadas"]
     reloj = pygame.time.Clock()
     datos["vida"] = 3
-    datos["comodin_vida_extra"] = True  # 🔄 Reactivar el comodín de vida al iniciar una nueva partida
+    datos["comodin_vida_extra"] = True  
     datos["comodines_disponibles"] = 3
-    datos["duracion_total"] = 60  # 🔥 Reiniciar el tiempo cada vez que inicia una nueva partida
+    datos["duracion_total"] = 60
     datos["tiempo_inicio"] = None  
     tiempo_restante = datos["duracion_total"]
 
@@ -385,12 +446,10 @@ def inicializar_variables(ventana):
 
     juego_terminado = False
 
-    TIEMPO_CONGELADO = 10
     comodin_activo = False
-    inicio_congelamiento = 0
 
     return (imagen_temporizador, imagen_puntuacion, imagen_vidas, siguiente_pantalla, color_fondo, color_texto, 
         inicio_linea, final_linea, grosor, color, linea_defensiva, linea_y, bandera_juego, datos["tiempo_inicio"], 
         input_rect, color_inactivo, color_activo, color_actual, texto_usuario, activo, posicion_vidas, posicion_puntajes,
-        mensaje, enemigos, palabras_seleccionadas, ancho_celda, alto_celda, matriz, posiciones_ocupadas, puntaje_actual, juego_terminado,
-        TIEMPO_CONGELADO, comodin_activo, inicio_congelamiento, tiempo_restante, reloj, multiplicador_puntos, palabras_multiplicadas)
+        mensaje, enemigos, palabras_seleccionadas, ancho_celda, alto_celda, matriz, posiciones_ocupadas, puntaje_actual, juego_terminado, 
+        comodin_activo, tiempo_restante, reloj, multiplicador_puntos, palabras_multiplicadas)

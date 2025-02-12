@@ -35,8 +35,7 @@ def ventana_juego():
     posicion_vidas, posicion_puntajes, mensaje, 
     enemigos, palabras_seleccionadas, ancho_celda, 
     alto_celda, matriz, posiciones_ocupadas, puntaje_actual, 
-    juego_terminado, TIEMPO_CONGELADO, comodin_activo, 
-    inicio_congelamiento, tiempo_restante, reloj, multiplicador_puntos, palabras_multiplicadas
+    juego_terminado, comodin_activo, tiempo_restante, reloj, multiplicador_puntos, palabras_multiplicadas
 ) = inicializar_variables(ventana)
     
     iniciar_temporizador()
@@ -63,17 +62,13 @@ def ventana_juego():
 
         bandera_juego, siguiente_pantalla, tiempo_restante = manejar_eventos_juego(
     eventos=eventos,
-    contexto="juego",
     boton_volver=boton_volver,
-    comodin_activo=comodin_activo,
     puntaje_actual=puntaje_actual,
-    tiempo_congelamiento=TIEMPO_CONGELADO,
-    TIEMPO_CONGELADO=TIEMPO_CONGELADO,
     datos=datos,
-    fuente=fuente,    # Aquí se pasa la fuente
+    fuente=fuente,
     ventana=ventana,
     reloj=reloj,
-    mensajes=mensajes  # ✅ Ahora sí se pasa el diccionario de mensajes
+    mensajes=mensajes
 )
 
         resultado = verificar_juego_terminado(
@@ -163,7 +158,7 @@ def ventana_juego():
                 actualizar_posiciones_enemigos(enemigos, DIMENSIONES_PANTALLA)
 
                 dibujar_enemigos(ventana, enemigos, fuente, color_texto)
-                mostrar_mensaje_comodin(ventana, datos, fuente, mensajes)  
+                mostrar_mensaje_comodin(ventana, datos, fuente)  
                 actualizar_mensaje_comodin(datos)  # Se encarga de eliminar el mensaje cuando pase el tiempo
         else:
             if tiempo_restante <= 0:

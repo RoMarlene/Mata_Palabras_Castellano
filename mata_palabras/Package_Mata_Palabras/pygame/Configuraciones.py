@@ -1,15 +1,15 @@
 import pygame
 
-"""_summary_
-
-Args:
-    eventos (any): Los eventos
-    volumen (int): El volumen
-
-Returns:
-    tuple: Devuelve el volumen "nuevo" y muestra el icono del volumen
-"""
 def ajustar_volumen(eventos: any, volumen: int)-> tuple:
+    """Crea la configuracion del volumen, para subirlo y bajarlo con el teclado
+
+    Args:
+        eventos (any): Los eventos
+        volumen (int): El volumen
+
+    Returns:
+        tuple: Devuelve el volumen "nuevo" y muestra el icono del volumen
+    """
     mostrar_icono = False
     for evento in eventos:
         if evento.type == pygame.KEYDOWN:
@@ -28,13 +28,13 @@ def ajustar_volumen(eventos: any, volumen: int)-> tuple:
 
     return volumen, mostrar_icono
 
-"""_summary_
-
-Args:
-    ventana (str): La ventana.
-    imagen_icono (str): Imagen del icono.
-    mostrar_icono (str): El icono en si.
-"""
 def mostrar_icono_volumen(ventana: str, imagen_icono:str, mostrar_icono:str):
+    """Muestra el icono del volumen
+
+    Args:
+        ventana (str): La ventana.
+        imagen_icono (str): Imagen del icono.
+        mostrar_icono (str): El icono en si.
+    """
     if mostrar_icono:
         ventana.blit(imagen_icono, (10, 10))
