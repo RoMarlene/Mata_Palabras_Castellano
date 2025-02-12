@@ -1,15 +1,15 @@
 import json
 import csv
 
-"""_summary_
-
-Args:
-    palabras_csv (str): Recibe el csv de las palabras pasado a una variable.
-
-Returns:
-    dict: Retorna dicho diccionario de palabras 
-"""
 def obtener_lista_palabras(palabras_csv: str) -> dict:
+    """Esta función obtiene el csv y lo convierte en diccionario,
+
+    Args:
+        palabras_csv (str): Recibe el csv de las palabras pasado a una variable.
+
+    Returns:
+        dict: Retorna dicho diccionario de palabras 
+    """
     diccionario_palabras = {
         "Faciles": {"Palabras": [], "Puntaje": 5},
         "Medias": {"Palabras": [], "Puntaje": 10},
@@ -41,16 +41,17 @@ def obtener_lista_palabras(palabras_csv: str) -> dict:
 
     return diccionario_palabras
 
-
-"""_summary_
-
-Args:
-    nombre (str): Nombre que pondrá el usuario.
-    puntaje (int): Puntaje del usuario.
-    tiempo (int): El tiempo del usuario.
-    vidas (int): Las vidas del usuario.
-"""
 def guardar_puntaje_json(nombre: str, puntaje: int, tiempo: int, vidas: int):
+    """
+    Esta función guarda el puntaje del usuario, tal sea su nombre, puntaje, tiempo 
+    y las vidas restantes.
+
+    Args:
+        nombre (str): Nombre que pondrá el usuario.
+        puntaje (int): Puntaje del usuario.
+        tiempo (int): El tiempo del usuario.
+        vidas (int): Las vidas del usuario.
+    """
     datos = {
         "Nombre": nombre,
         "Puntaje": puntaje,

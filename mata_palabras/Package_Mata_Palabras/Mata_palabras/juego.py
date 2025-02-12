@@ -28,7 +28,6 @@ def crear_juego():
         estado_variables["tiempo_inicio"] = time.time()
 
 
-
         print(f"Vidas: {estado_variables['vidas']} | Puntaje: {estado_variables['puntaje']} | Tiempo restante: {estado_variables['tiempo']} segundos")
         print(f"Comodines disponibles: {estado_variables['comodines_disponibles']}")
 

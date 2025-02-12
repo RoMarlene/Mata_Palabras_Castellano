@@ -32,11 +32,11 @@ def ventana_juego():
     linea_defensiva, linea_y, bandera_juego, 
     datos["tiempo_inicio"], input_rect, color_inactivo, 
     color_activo, color_actual, texto_usuario, activo, 
-    vidas, posicion_vidas, posicion_puntajes, mensaje, 
+    posicion_vidas, posicion_puntajes, mensaje, 
     enemigos, palabras_seleccionadas, ancho_celda, 
     alto_celda, matriz, posiciones_ocupadas, puntaje_actual, 
     juego_terminado, TIEMPO_CONGELADO, comodin_activo, 
-    inicio_congelamiento, tiempo_restante
+    inicio_congelamiento, tiempo_restante, reloj, multiplicador_puntos, palabras_multiplicadas
 ) = inicializar_variables(ventana)
     
     iniciar_temporizador()
@@ -52,36 +52,33 @@ def ventana_juego():
                     nombre_boton="volver"
                 )
             
-            tiempo_restante, inicio_congelamiento = manejar_comodines(
-    evento, datos, tiempo_restante, inicio_congelamiento, TIEMPO_CONGELADO, ventana, mensajes, fuente
-)
             if siguiente_pantalla == "menu":
                 pygame.mixer.music.stop()  # Detenemos la música de esta pantalla
                 bandera_juego = False  # Terminamos el bucle del juego
                 break  # Salimos del bucle de eventos
-        
-            tiempo_restante, inicio_congelamiento = manejar_comodines(
-                evento, datos, tiempo_restante, inicio_congelamiento, TIEMPO_CONGELADO, ventana, mensajes, fuente
-            )
+
         # Aquí sigue el resto de la lógica del juego, solo si no se ha presionado "Volver"
         if bandera_juego == False:
             break
 
         bandera_juego, siguiente_pantalla, tiempo_restante = manejar_eventos_juego(
-        eventos=eventos,
-        contexto="juego",
-        boton_volver=boton_volver,
-        comodin_activo=comodin_activo,
-        tiempo_congelamiento=TIEMPO_CONGELADO,
-        TIEMPO_CONGELADO=TIEMPO_CONGELADO,
-        datos=datos,
-        fuente=fuente,    # Aquí se pasa la fuente
-        ventana=ventana   # Aquí se pasa la ventana
-    )
+    eventos=eventos,
+    contexto="juego",
+    boton_volver=boton_volver,
+    comodin_activo=comodin_activo,
+    puntaje_actual=puntaje_actual,
+    tiempo_congelamiento=TIEMPO_CONGELADO,
+    TIEMPO_CONGELADO=TIEMPO_CONGELADO,
+    datos=datos,
+    fuente=fuente,    # Aquí se pasa la fuente
+    ventana=ventana,
+    reloj=reloj,
+    mensajes=mensajes  # ✅ Ahora sí se pasa el diccionario de mensajes
+)
 
         resultado = verificar_juego_terminado(
             juego_terminado=juego_terminado,
-            vidas=vidas,
+            vidas=datos["vida"],
             ventana=ventana,
             imagen_fondo_juego=imagen_fondo_juego,
             mensajes=mensajes,
@@ -96,7 +93,7 @@ def ventana_juego():
             siguiente_pantalla = crear_final(
             puntaje_actual=puntaje_actual,
             tiempo_jugado=datos["duracion_total"] - tiempo_restante,
-            vidas_restantes=vidas
+            vidas_restantes=datos["vida"]
         )
             bandera_juego = False
             break
@@ -107,8 +104,8 @@ def ventana_juego():
 
         color_actual = manejar_colores_cuadro_texto(activo, color_activo, color_inactivo)
 
-        texto_usuario, activo, eliminar_palabra, vidas, puntaje_actual, texto_procesado = manejar_cuadro_texto(
-        eventos, texto_usuario, activo, input_rect, palabras_enemigos, vidas, puntaje_actual, diccionario_palabras
+        texto_usuario, activo, eliminar_palabra, datos["vida"], puntaje_actual, texto_procesado = manejar_cuadro_texto(
+        eventos, texto_usuario, activo, input_rect, palabras_enemigos, datos["vida"], puntaje_actual, diccionario_palabras
         )
 
         if eliminar_palabra:
@@ -124,8 +121,8 @@ def ventana_juego():
         colision_detectada = verificar_colision_con_linea(enemigos, linea_y)
 
         if colision_detectada:
-            vidas = restar_vidas(vidas)
-            if vidas <= 0:
+            datos["vida"] = restar_vidas(datos["vida"])
+            if datos["vida"] <= 0:
                 juego_terminado = True
 
         ventana.blit(imagen_fondo_juego, [0, 0])
@@ -142,7 +139,7 @@ def ventana_juego():
                 dibujar(boton_volver)
                 blitear_imagenes(ventana, elementos)
                 mostrar_texto(ventana, str(tiempo_restante), posiciones["posicion_temporizador"], datos["color_temporizador"], datos["tamaño_fuente_temporizador"])
-                mostrar_texto(ventana, vidas, posicion_vidas, color_texto, datos["tamaño_fuente_temporizador"])
+                mostrar_texto(ventana, str(datos["vida"]), posicion_vidas, color_texto, datos["tamaño_fuente_temporizador"])
                 mostrar_texto(ventana, puntaje_actual, posicion_puntajes, color_texto, 30)
 
                 if len(enemigos) < datos["maximo_enemigos"]:
@@ -166,8 +163,8 @@ def ventana_juego():
                 actualizar_posiciones_enemigos(enemigos, DIMENSIONES_PANTALLA)
 
                 dibujar_enemigos(ventana, enemigos, fuente, color_texto)
+                mostrar_mensaje_comodin(ventana, datos, fuente, mensajes)  
                 actualizar_mensaje_comodin(datos)  # Se encarga de eliminar el mensaje cuando pase el tiempo
-                mostrar_mensaje_comodin(ventana, datos, posiciones, fuente)  
         else:
             if tiempo_restante <= 0:
                 posicion = (240, 250)

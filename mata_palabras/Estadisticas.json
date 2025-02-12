@@ -1,62 +1,14 @@
 [
     {
-        "Nombre": "Nowhere",
-        "Puntaje": "00210",
-        "Tiempo": 51,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "Chiquii",
-        "Puntaje": "00195",
-        "Tiempo": 44,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "Holaa",
-        "Puntaje": "00180",
-        "Tiempo": 47,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "Trakateee",
-        "Puntaje": "00130",
+        "Nombre": "Tukiii",
+        "Puntaje": "00240",
         "Tiempo": 35,
         "Vidas": 0
     },
     {
-        "Nombre": "Historyyy",
-        "Puntaje": "00090",
-        "Tiempo": 27,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "Final",
-        "Puntaje": "00015",
-        "Tiempo": 15,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "dsadsaa",
-        "Puntaje": "00000",
-        "Tiempo": 3,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "Holaa",
-        "Puntaje": "00000",
-        "Tiempo": 14,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "Tutu",
-        "Puntaje": "00000",
-        "Tiempo": 14,
-        "Vidas": 0
-    },
-    {
-        "Nombre": "tuku",
-        "Puntaje": "00000",
-        "Tiempo": 14,
+        "Nombre": "No se",
+        "Puntaje": "00190",
+        "Tiempo": 51,
         "Vidas": 0
     }
 ]

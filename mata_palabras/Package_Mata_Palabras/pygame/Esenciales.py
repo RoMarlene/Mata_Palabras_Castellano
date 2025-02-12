@@ -19,16 +19,18 @@ Args:
 Returns:
     int: El tiempo restante.
 """
-def crear_temporizador(duracion_total: int, tiempo_inicio: int)-> int:
+def crear_temporizador(duracion_total, tiempo_inicio, datos):
     tiempo_actual = pygame.time.get_ticks()
-    tiempo_transcurrido = (tiempo_actual - tiempo_inicio) // 1000
-    tiempo_restante = duracion_total - tiempo_transcurrido
-    
+
+    if datos["tiempo_congelado"]:  
+        tiempo_restante = datos["tiempo_restante_congelacion"]  # Mantiene el tiempo congelado
+    else:
+        tiempo_restante = duracion_total - (tiempo_actual - tiempo_inicio) // 1000  # Calcula tiempo normal
+
     if tiempo_restante < 0:
         tiempo_restante = 0
 
     return tiempo_restante
-
 
 """
 Esta funcion resta las vidas.
@@ -95,7 +97,7 @@ def calcular_puntaje(diccionario: dict, puntaje: int, palabra: str) -> int:
         lista_palabras = diccionario[clave]["Palabras"]
         for palabra_lista in lista_palabras:
             if palabra == palabra_lista:  
-                puntaje_actualizado += diccionario[clave]["Puntaje"]  
+                puntaje_actualizado += diccionario[clave]["Puntaje"] * datos["multiplicador_puntos"]  # Aplicamos el multiplicador  
                 break  
     return puntaje_actualizado
 

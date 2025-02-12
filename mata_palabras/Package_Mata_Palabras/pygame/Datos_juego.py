@@ -23,19 +23,35 @@ datos = {
     "Rectangulo_texto_final": pygame.Rect(200, 300, 400, 50),
     "rectangulo_texto_juego": pygame.Rect(50, 500, 200, 50),
     "color_inactivo": pygame.Color('lightskyblue3'),
-    "color_activo" : pygame.Color('dodgerblue2'),
+    "color_activo": pygame.Color('dodgerblue2'),
     "tamaño_icono_volumen": (50, 50),
     "volumen_predefinido": 0.5,
     "tamaño_boton_empezar": (245, 85),
     "tamaño_boton_puntuacion": (245, 85),
     "tamaño_boton_volver": (160, 56),
     "longitud_minima": 5,
-    "comodines_disponibles": 3,  # Total de comodines disponibles
-    "comodin_tiempo_disponible": True,  # Estado del comodín de tiempo
+    "comodines_disponibles": 3,  
+    "comodin_tiempo_disponible": True,  
+    "comodin_vida_extra": True,
+    "comodin_duplicador_disponible": True,  
     "tiempo_extra": 10,
-    "mensaje_comodin": None,  # Inicialmente, no hay mensaje
-    "tiempo_inicio_mensaje_comodin": 0  # Guardará el tiempo en que se activó
+    "mensaje_comodin": "",  
+    "tiempo_inicio_mensaje_comodin": 0,  
+    "tiempo_congelado": False,
+    "tiempo_restante_congelacion": 0,  
+    "multiplicador_puntos": 1,
+    "palabras_multiplicadas": 0,
+    "esperando_palabra": False,
+    "palabra_acertada": False,
+    "mostrar_mensaje_sin_comodines": False,
+    "tiempo_inicio_mensaje_sin_comodines": 0,
+    
+    # 🔥 Nuevo control para mostrar primero el mensaje del último comodín
+    "mostrar_mensaje_ultimo_comodin": False,
+    "tiempo_inicio_mensaje_ultimo_comodin": 0,
+    "cooldown_mensaje_sin_comodines": 0
 }
+
 
 posiciones = {
     "posicion_temporizador": (50, 20),
@@ -45,7 +61,8 @@ posiciones = {
     "posicion_mensaje_inicio": (183, 531),
     "posicion_boton_empezar": (275, 271),
     "posicion_boton_puntuacion": (273,456),
-    "posicion_boton_volver": (624, 68)
+    "posicion_boton_volver": (624, 68),
+    "posicion_mensaje_comodin": (240, 250)
 }
 
 imagenes = {
@@ -76,13 +93,12 @@ sonidos = {
 mensajes = {
     "tiempo_agotado": "¡Se acabó el tiempo! :(",
     "vidas_agotadas": "¡Se acabaron las vidas! Perdiste.",
-    "congelacion": "¡Corre, corre! ¡El tiempo ha vuelto a correr!",
-    "comodines_usados": "Este comodín ya no está disponible.",
     "sin_comodines": "¡Ya no hay comodines disponibles!",
     "mensaje_final": "¡Nombre guardado!",
     "mensaje_inicio": "Presiona ENTER para empezar el juego",
-    "mensaje_tiempo_extra": "¡Comodín usado! Tiempo extra añadido"
-    
+    "mensaje_tiempo_extra": "¡Comodín usado! Tiempo extra añadido",
+    "mensaje_vida_agregada": "¡Comodín usado! vida extra añadida",
+    "mensaje_puntaje_doble": "¡Comodín usado! Tenés 10 palabras con puntaje doble",
 }
 
 TECLAS_JUEGO = {
@@ -93,7 +109,7 @@ TECLAS_JUEGO = {
     "borrar": pygame.K_BACKSPACE,
     "comodin_tiempo": pygame.K_1,
     "comodin_vida": pygame.K_2,
-    "comodin_congelacion": pygame.K_3,
+    "comodin_puntaje_doble": pygame.K_3,
 }
 
 

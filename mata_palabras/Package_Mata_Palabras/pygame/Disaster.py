@@ -1,6 +1,7 @@
 import random
 import json
 import pygame
+from Datos_juego import datos, mensajes
 
 #Esta función crea una matriz para las posiciones en pantalla, crea la matriz con el tamaño de la pantalla
 #las "celdas" de la matriz representan posibles posiciones para las palabras.
@@ -70,17 +71,20 @@ def ordenar_estadistica(data:int, longitud_minima:int):
         with open("Estadisticas.json", 'w') as archivo:
             json.dump(data, archivo, indent=4)
 
-#Funcion que congela el tiempo en un periddo especifico
-#recibe el tiempo_restante, el tiempo congelado y el inicio de congelamiento
-def congelar_tiempo(tiempo_restante: int, tiempo_congelado:int, inicio_congelamiento:int) ->list:
-    tiempo_actual = pygame.time.get_ticks()  
-    tiempo_transcurrido = (tiempo_actual - inicio_congelamiento) / 1000
+def comodin_duplicar_puntos(palabras_restantes):
+    datos["palabra_acertada"] = datos.get("palabra_acertada", False)  
 
-    if tiempo_transcurrido < tiempo_congelado:  # Si no terminó
-        pygame.time.wait(50)  # evita recursion infinita
-        return congelar_tiempo(tiempo_restante, tiempo_congelado, inicio_congelamiento)
+    if palabras_restantes > 0:
+        datos["multiplicador_puntos"] = 2
+
+        if palabras_restantes == 10:  
+            datos["mensaje_comodin"] = mensajes["mensaje_puntaje_doble"]
+            datos["comodines_disponibles"] -= 1
+            datos["tiempo_inicio_mensaje_comodin"] = pygame.time.get_ticks()
+
+        if datos["palabra_acertada"]:  
+            datos["palabra_acertada"] = False
+            comodin_duplicar_puntos(palabras_restantes - 1)
+
     else:
-        tiempo_restante -= tiempo_congelado  #Actualizamos el tiempo restante 
-        if tiempo_restante < 0:  # Aseguramos que no sea negativo
-            tiempo_restante = 0
-        return tiempo_restante 
+        datos["multiplicador_puntos"] = 1

@@ -1,19 +1,19 @@
 import pygame
 
-"""Crea el boton
-
-Args:
-    ventana (str): Recibe la superficie.
-    posicion (int): La posición.
-    dimensiones_boton (int): Las dimensiones del botón.
-    fuente (str, optional): La fuente del boton. Por defecto devuelve None.
-    path_imagen (str, optional): El path de la imagen. Por defecto devuelve None.
-
-Returns:
-    dict: El diccionario del boton (O sea, lo que contiene)
-"""
 
 def crear_boton(ventana: str, posicion: int, dimensiones_boton: int, fuente: str = None, path_imagen: str = None) -> dict:
+    """Crea el boton
+
+    Args:
+        ventana (str): Recibe la superficie.
+        posicion (int): La posición.
+        dimensiones_boton (int): Las dimensiones del botón.
+        fuente (str, optional): La fuente del boton. Por defecto devuelve None.
+        path_imagen (str, optional): El path de la imagen. Por defecto devuelve None.
+
+    Returns:
+        dict: El diccionario del boton (O sea, lo que contiene)
+    """
     boton = {}
     boton["Ventana"] = ventana #Surface
     boton["Posicion"] = posicion #Tupla
@@ -30,13 +30,12 @@ def crear_boton(ventana: str, posicion: int, dimensiones_boton: int, fuente: str
     
     return boton
 
-
-"""
-Dibuja el boton.
-Args:
-    boton (dict): Recibe el boton
-"""
 def dibujar(boton: dict):
+    """
+    Dibuja el boton.
+    Args:
+        boton (dict): Recibe el boton
+    """
     try:
         # Verifica que la ventana esté activa antes de intentar blitear
         if boton["Ventana"]:

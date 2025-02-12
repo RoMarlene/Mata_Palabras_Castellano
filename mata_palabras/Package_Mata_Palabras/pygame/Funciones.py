@@ -151,70 +151,81 @@ def blitear_imagenes(ventana, elementos):
     for imagen, posicion in elementos:
         ventana.blit(imagen, posicion)
 
-def manejar_eventos_juego(eventos, contexto, boton_volver, fuente, ventana, comodin_activo=False, tiempo_congelamiento=0, TIEMPO_CONGELADO=0, datos=None):
+def manejar_eventos_juego(eventos, contexto, boton_volver, fuente, ventana, reloj, puntaje_actual,  
+                        comodin_activo=False, tiempo_congelamiento=0, TIEMPO_CONGELADO=0, datos=None, mensajes=None):
     """
-    Maneja los eventos del juego, incluyendo los eventos de teclado y ratón, y la lógica de control del comodín.
+    Maneja los eventos del juego, incluyendo eventos de teclado, ratón, lógica de comodines y entrada de palabras.
     """
     bandera_juego = True
     siguiente_pantalla = None
-    tiempo_restante = None  # Inicializamos tiempo_restante
+    tiempo_restante = 0  # 🔴 Inicializamos en 0 para evitar valores None
+    texto_ingresado = ""  # 📌 Acumulador de texto ingresado por el usuario
 
     for evento in eventos:
-        match evento:
-            case pygame.QUIT:
+        if evento.type == pygame.QUIT:
+            bandera_juego = False
+            siguiente_pantalla = "salir"
+
+        elif evento.type == pygame.MOUSEBUTTONDOWN:
+            if boton_volver and boton_volver == "menu":
                 bandera_juego = False
-                siguiente_pantalla = "salir"
-            case pygame.MOUSEBUTTONDOWN:
-                # Lógica para manejar clics del ratón
-                siguiente_pantalla = boton_volver
-                if siguiente_pantalla == "menu":
-                    bandera_juego = False
-            case pygame.KEYDOWN:
-                # Lógica para manejar presion de teclas
-                siguiente_pantalla = boton_volver
-                if siguiente_pantalla == "menu":
-                    bandera_juego = False
 
-                # Verificar si se activa el comodín de tiempo
-                if evento.key == TECLAS_JUEGO["comodin_tiempo"]:  # Comprobar si se presiona la tecla del comodín
-                    if comodin_activo == False:  # Comprobar si el comodín no está activo
-                        activar_comodin_tiempo(
-                            evento=evento,
-                            diccionario_juego=datos,
-                            tiempo_inicio=datos["tiempo_inicio"],
-                            diccionario_mensajes=mensajes,
-                            fuente=fuente,
-                            pantalla=ventana,
-                            posicion=(240, 200),  # Puedes cambiar la posición donde se muestra el mensaje
-                            color_fondo=(0, 0, 0),  # Fondo negro
-                            color_texto=(255, 255, 255)  # Texto blanco
-                        )
-                        comodin_activo = True  # Marcamos el comodín como activo
-                    else:
-                        pass  # Si el comodín ya está activo, no hacer nada
+        elif evento.type == pygame.KEYDOWN:
+            # 🔥 Manejar uso de comodines
+            resultado = manejar_comodines(evento, datos, tiempo_restante, tiempo_congelamiento, TIEMPO_CONGELADO, ventana, mensajes, fuente, reloj)
+            
+            try:
+                tiempo_restante, inicio_congelamiento, comodin_usado = resultado
+            except ValueError:
+                tiempo_restante, inicio_congelamiento = resultado, 0
+                comodin_usado = False
 
-    # Temporizador (si el comodín no está activo)
-    if comodin_activo == False and datos:
-        tiempo_restante = crear_temporizador(datos["duracion_total"], datos["tiempo_inicio"])
+            if comodin_usado:
+                continue  # Saltamos el resto de la lógica si se usó un comodín
+
+            # 📌 Captura de texto del usuario
+            if evento.key == pygame.K_RETURN:  # Si presiona Enter, validar palabra
+                palabra_correcta = validar_palabra(texto_ingresado, datos, diccionario_palabras, datos["vida"], puntaje_actual)
+
+                if palabra_correcta:
+                    print(f"🎯 ¡Palabra correcta: {texto_ingresado}!")
+
+                    # 🔥 Si el comodín de duplicador está activo, forzar recursión explícita
+                    if datos["multiplicador_puntos"] == 2 and datos["esperando_palabra"]:
+                        datos["esperando_palabra"] = False  # 🔄 Resetear la espera
+                        comodin_duplicar_puntos(10)  # ✅ 🔥 Recursión explícita ocurre aquí
+
+                    puntaje_actual = calcular_puntaje(diccionario_palabras, puntaje_actual, texto_ingresado)
+
+                texto_ingresado = ""  # Resetear input después de validar
+
+            elif evento.key == pygame.K_BACKSPACE:
+                texto_ingresado = texto_ingresado[:-1]  # Borrar última letra
+
+            else:
+                texto_ingresado += evento.unicode  # Agregar letra a la palabra
+
+    # ✅ Evita que el tiempo quede en None
+    tiempo_restante = crear_temporizador(datos["duracion_total"], datos["tiempo_inicio"], datos)
+    if tiempo_restante == None:
+        tiempo_restante = 0  
 
     pygame.display.flip()
 
     return bandera_juego, siguiente_pantalla, tiempo_restante
 
-def gestionar_temporizador(evento, datos, tiempo_restante, diccionario_mensajes, fuente, pantalla):
-    print("🔹 Evento recibido en gestionar_temporizador:", evento)  # Debug
 
+def gestionar_temporizador(evento, datos, tiempo_restante, diccionario_mensajes, fuente, pantalla):
+    """
+    Maneja la activación del temporizador y evita que se use el comodín dos veces.
+    """
     if evento.type == pygame.KEYDOWN:
         if evento.key == TECLAS_JUEGO["comodin_tiempo"]:
-            print("✅ Se activó el comodín de tiempo")  # Debug
-            activar_comodin_tiempo(datos, datos["tiempo_inicio"], diccionario_mensajes, fuente, pantalla, 
-                                    datos["BLANCO"])
-
-
+            if datos["comodin_tiempo_disponible"]:
+                datos = activar_comodin_tiempo(datos, datos["tiempo_inicio"], diccionario_mensajes, fuente, pantalla, datos["BLANCO"])
+    
     tiempo_restante = calcular_tiempo_restante(datos)
-    print("⏳ Tiempo restante calculado:", tiempo_restante)  # Debug
-
-    return tiempo_restante, False
+    return tiempo_restante, datos["tiempo_inicio"]
 
 def verificar_juego_terminado(juego_terminado, vidas, ventana, imagen_fondo_juego, mensajes, color_texto, fuente, puntaje_actual, datos, tiempo_restante):
     """
@@ -246,7 +257,90 @@ def dibujar_rectangulo_texto(ventana, color_actual, input_rect,fuente, texto_usu
     texto_renderizado = fuente.render(texto_usuario, True, datos["BLANCO"])
     ventana.blit(texto_renderizado, (input_rect.x + 5, input_rect.y + 5))
 
+def manejar_comodines(evento, datos, tiempo_restante, inicio_congelamiento, TIEMPO_CONGELADO, ventana, mensajes, fuente, reloj):
+    """
+    Maneja los comodines del juego: tiempo extra, vida extra y duplicador de puntos.
+    """
+    comodin_usado = False  # ✅ Inicialmente, no se usó ningún comodín
+
+    if evento.type == pygame.KEYDOWN:
+        tecla_presionada = evento.key
+
+        tecla_comodin_tiempo = TECLAS_JUEGO["comodin_tiempo"]
+        tecla_comodin_vida = TECLAS_JUEGO["comodin_vida"]
+        tecla_comodin_duplicador = TECLAS_JUEGO["comodin_puntaje_doble"]  # Ahora es duplicador
+
+        if tecla_presionada == tecla_comodin_tiempo:
+            match tecla_presionada:
+                case tecla_comodin_tiempo:
+                    print(f"DEBUG: mensajes dentro de gestionar_temporizador = {mensajes}")
+                    tiempo_restante, _ = gestionar_temporizador(
+                        evento=evento,
+                        datos=datos,
+                        tiempo_restante=tiempo_restante,
+                        diccionario_mensajes=mensajes,
+                        fuente=fuente,
+                        pantalla=ventana
+                    )
+                    comodin_usado = True  # ✅ Se usó un comodín
+
+        elif tecla_presionada == tecla_comodin_vida:
+            match tecla_presionada:
+                case tecla_comodin_vida:
+                    print(f"DEBUG: mensajes dentro de vida = {mensajes}")
+                    datos = activar_comodin_vida(
+                        diccionario_juego=datos,
+                        diccionario_mensajes=mensajes,
+                        fuente=fuente,
+                        pantalla=ventana,
+                        color_texto=(255, 255, 255)
+                    )
+                    comodin_usado = True  # ✅ Se usó un comodín
+
+        elif tecla_presionada == tecla_comodin_duplicador:
+            match tecla_presionada:
+                case tecla_comodin_duplicador:
+                    if datos["comodin_duplicador_disponible"]:
+                        print("🟢 Activando comodín de puntos dobles...")
+                        datos["multiplicador_puntos"] = 2
+                        datos["palabras_multiplicadas"] = 0
+                        datos["comodin_duplicador_disponible"] = False
+
+                        # 🔥 Llamar al comodín para que comience su efecto
+                        comodin_duplicar_puntos(10)  
+                        comodin_usado = True  # ✅ Se usó un comodín
+
+            if comodin_usado:
+                datos["comodines_disponibles"] -= 1
+                print(f"🔥 Comodín usado, quedan: {datos['comodines_disponibles']}")
+                if datos["comodines_disponibles"] == 0:
+                    datos["tiempo_inicio_mensaje_ultimo_comodin"] = pygame.time.get_ticks()
+                    datos["mostrar_mensaje_ultimo_comodin"] = True
+                    print("🟠 Mostrando mensaje de último comodín.")
+
+    return tiempo_restante, inicio_congelamiento, comodin_usado
+
 def inicializar_variables(ventana):
+    datos["multiplicador_puntos"] = 1
+    datos["palabras_multiplicadas"] = 0
+    datos["vida"] = 3
+    datos["comodin_vida_extra"] = True  # 🔄 Reactivar el comodín de vida
+    datos["comodines_disponibles"] = 3
+    datos["comodin_tiempo_disponible"] = True  # ✅ Asegurar que el comodín de tiempo esté disponible
+    datos["comodin_duplicador_disponible"] = True  # ✅ Reiniciar el comodín de duplicación
+    datos["tiempo_extra"] = 10
+    datos["duracion_total"] = 60
+    datos["tiempo_inicio"] = None  # Reiniciar el tiempo de inicio
+    multiplicador_puntos = datos["multiplicador_puntos"]
+    palabras_multiplicadas = datos["palabras_multiplicadas"]
+    reloj = pygame.time.Clock()
+    datos["vida"] = 3
+    datos["comodin_vida_extra"] = True  # 🔄 Reactivar el comodín de vida al iniciar una nueva partida
+    datos["comodines_disponibles"] = 3
+    datos["duracion_total"] = 60  # 🔥 Reiniciar el tiempo cada vez que inicia una nueva partida
+    datos["tiempo_inicio"] = None  
+    tiempo_restante = datos["duracion_total"]
+
     imagen_temporizador = pygame.image.load(imagenes["Temporizador"])
     imagen_temporizador = pygame.transform.smoothscale(imagen_temporizador, (60, 60))
 
@@ -268,7 +362,6 @@ def inicializar_variables(ventana):
     linea_y = inicio_linea[1]
     
     bandera_juego = True
-    datos["tiempo_inicio"] = None 
 
     input_rect = datos["rectangulo_texto_juego"]
     color_inactivo = pygame.Color('lightskyblue3')
@@ -276,7 +369,6 @@ def inicializar_variables(ventana):
     color_actual = color_inactivo
     texto_usuario = ""
     activo = False
-    vidas = datos["vida"]
     posicion_vidas = posiciones["posicion_vida"]
     posicion_puntajes = posiciones["posicion_puntaje"]
 
@@ -296,46 +388,9 @@ def inicializar_variables(ventana):
     TIEMPO_CONGELADO = 10
     comodin_activo = False
     inicio_congelamiento = 0
-    tiempo_restante = datos["duracion_total"]
 
     return (imagen_temporizador, imagen_puntuacion, imagen_vidas, siguiente_pantalla, color_fondo, color_texto, 
         inicio_linea, final_linea, grosor, color, linea_defensiva, linea_y, bandera_juego, datos["tiempo_inicio"], 
-        input_rect, color_inactivo, color_activo, color_actual, texto_usuario, activo, vidas, posicion_vidas, posicion_puntajes,
+        input_rect, color_inactivo, color_activo, color_actual, texto_usuario, activo, posicion_vidas, posicion_puntajes,
         mensaje, enemigos, palabras_seleccionadas, ancho_celda, alto_celda, matriz, posiciones_ocupadas, puntaje_actual, juego_terminado,
-        TIEMPO_CONGELADO, comodin_activo, inicio_congelamiento, tiempo_restante)
-
-
-def manejar_comodines(evento, datos, tiempo_restante, inicio_congelamiento, TIEMPO_CONGELADO, ventana, mensajes, fuente):
-    if evento.type == pygame.KEYDOWN:
-        tecla_presionada = evento.key  # Guardamos la tecla presionada
-
-        # Extraemos los valores de las teclas para que match-case los reconozca correctamente
-        tecla_comodin_tiempo = TECLAS_JUEGO["comodin_tiempo"]
-        #tecla_comodin_otro = TECLAS_JUEGO["comodin_otro"]
-        #tecla_comodin_extra = TECLAS_JUEGO["comodin_extra"]
-
-        # Aquí la comparación para que el match-case sea válido
-        if tecla_presionada == tecla_comodin_tiempo:
-            match tecla_presionada:
-                case tecla_comodin_tiempo:
-                    tiempo_restante, _ = gestionar_temporizador(
-                    evento=evento,
-                    datos=datos,
-                    tiempo_restante=tiempo_restante,
-                    diccionario_mensajes=mensajes,
-                    fuente=fuente,
-                    pantalla=ventana
-                )
-                    print("Tecla presionada en manejar_comodines:", evento.key)
-
-        # elif tecla_presionada == tecla_comodin_otro:
-        #     match tecla_presionada:
-        #         case tecla_comodin_otro:
-        #             pass
-
-        # elif tecla_presionada == tecla_comodin_extra:
-        #     match tecla_presionada:
-        #         case tecla_comodin_extra:
-        #             pass
-
-    return tiempo_restante, inicio_congelamiento
+        TIEMPO_CONGELADO, comodin_activo, inicio_congelamiento, tiempo_restante, reloj, multiplicador_puntos, palabras_multiplicadas)
